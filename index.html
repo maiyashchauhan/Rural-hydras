@@ -1,0 +1,2105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Rural Hydras — Water Health Platform</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:400,600,700&display=swap">
+<style>
+  :root{
+    --bg: #000000;
+    --card: #111111;
+    --muted: #bbbbbb;
+    --accent: #16a34a;
+    --accent2: #06b6d4;
+    --danger: #e11d48;
+    --warn: #eab308;
+    --dark: #ffffff;
+    --glass: rgba(0,0,0,0.6);
+    --shadow: 0 8px 32px 0 #0009;
+    --radius: 18px;
+    --input-bg: #111111;
+    --input-focus: #1a1a1a;
+    --input-border: #06b6d4;
+    --select-bg: #111111;
+    --select-color: #ffffff;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Inter,Arial,Helvetica,sans-serif;
+    background: var(--bg);
+    color: var(--dark);
+    min-height:100vh;
+    position:relative;
+  }
+  #splash, #verify, #role, #dashboard, #govtVerify, #dept, #report {
+    z-index: 1;
+  }
+  #splash{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    position:absolute;
+    inset:0;
+    background: var(--bg);
+  }
+  #logo{
+    width:92px;height:92px;border-radius:18px;
+    background:linear-gradient(135deg,#b7e4c7,#a5d8ff);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--dark);font-weight:700;font-size:30px;
+    box-shadow:var(--shadow);
+    margin-bottom:10px;
+    border:3px solid #e3efe7;
+  }
+  h1{margin:0;font-size:32px;letter-spacing:1px;text-shadow:0 2px 8px #fff8;}
+  #splash p {font-size:16px;color:var(--muted);}
+  #verify,#role,#dashboard,#govtVerify,#dept,#report{
+    display:none;
+    position:absolute;
+    inset:0;
+    align-items:center;
+    justify-content:center;
+    background:rgba(255,255,255,0.5);
+  }
+  .card{
+    background: var(--card);
+    color: var(--dark);
+    padding:36px 32px 28px 32px;
+    border-radius:var(--radius);
+    text-align:center;
+    width:370px;
+    box-shadow:var(--shadow);
+    border:1.5px solid #e3efe7;
+    margin:0 auto;
+  }
+  input,textarea,button{
+    width:100%;
+    padding:13px;
+    margin-top:13px;
+    border-radius:8px;
+    border:none;
+    font-size:17px;
+    font-family:inherit;
+    background:var(--input-bg);
+    color:var(--dark);
+    outline:none;
+    transition:background 0.2s, border 0.2s;
+  }
+  input:focus,textarea:focus{
+    background:var(--input-focus);
+    border:1.5px solid var(--input-border);
+  }
+  select{
+    width:100%;
+    padding:13px;
+    margin-top:13px;
+    border-radius:8px;
+    border:1.5px solid var(--accent2);
+    font-size:17px;
+    font-family:inherit;
+    background:var(--select-bg);
+    color:var(--select-color);
+    outline:none;
+    appearance: none;
+    box-shadow:0 2px 8px #0001;
+    transition:background 0.2s, border 0.2s;
+  }
+  select:focus{
+    background:var(--input-focus);
+    border:1.5px solid var(--input-border);
+    color:var(--dark);
+  }
+  textarea{min-height:90px;resize:vertical}
+  button{
+    background:var(--accent);
+    color:#fff;
+    font-weight:700;
+    cursor:pointer;
+    transition:background 0.2s,box-shadow 0.2s;
+    box-shadow:0 2px 8px #0001;
+    margin-top:18px;
+    font-size:18px;
+    letter-spacing:0.5px;
+  }
+  button:hover{background:#22c55e;}
+  .show{display:flex!important;position:absolute!important;inset:0!important;align-items:center;justify-content:center;}
+  .hidden{display:none!important}
+  .dash-wrapper{width:100%;height:100%;display:flex;flex-direction:column}
+  header{
+    background: var(--glass);
+    color: var(--dark);
+    padding:18px 32px;
+    display:flex;justify-content:space-between;align-items:center;
+    border-radius:0 0 18px 18px;
+    box-shadow:0 2px 12px 0 #0001;
+    z-index:2;
+    border-bottom:1.5px solid #e3efe7;
+  }
+  .user-info{
+    display:flex;align-items:center;gap:12px;
+    font-size:17px;
+    color:var(--muted);
+  }
+  .avatar{
+    width:38px;height:38px;border-radius:50%;
+    background:linear-gradient(135deg,#b7e4c7,#a5d8ff);
+    color:var(--dark);
+    font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;
+    border:2px solid #e3efe7;
+  }
+  main{
+    flex:1;
+    padding:32px 18px 24px 18px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px;
+    overflow:auto;
+    background:rgba(255,255,255,0.18);
+    border-radius:0 0 18px 18px;
+    justify-content:center;
+  }
+  .dashboard-flex {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: center;
+  }
+  .left-panel {
+    flex: 1 1 330px;
+    min-width: 270px;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .right-panel {
+    flex: 1 1 320px;
+    min-width: 260px;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  section{
+    background: var(--glass);
+    color: var(--dark);
+    padding:18px 14px 14px 14px;
+    border-radius:var(--radius);
+    box-shadow:0 2px 12px 0 #0001;
+    border:1px solid #e3efe7;
+    position:relative;
+    margin-bottom:0;
+    font-size: 15px;
+  }
+  section h3, section h4 {margin-top:0;}
+  .lab-bargraph-container {
+    width: 100%;
+    max-width: 340px;
+    margin: 0 auto 10px auto;
+    background: var(--card);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px #0001;
+    padding: 8px 4px 4px 4px;
+    position: relative;
+    font-size: 12px;
+  }
+  .lab-bargraph-legend {
+    display: flex;
+    gap: 8px;
+    font-size: 10px;
+    margin-bottom: 2px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .lab-bargraph-legend span {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+  .legend-dot {
+    width: 9px; height: 9px; border-radius: 50%; display: inline-block;
+  }
+  .ph-dot { background: #e11d48; }
+  .turb-dot { background: #eab308; }
+  .oxy-dot { background: #e11d48; }
+  .nitrate-dot { background: #16a34a; }
+  .chlorine-dot { background: #e11d48; }
+  .lab-bargraph {
+    width: 100%;
+    height: 140px;
+    display: block;
+    background: #f8fdfb;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px #0001;
+  }
+  .lab-bargraph-xlabels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #6b7c74;
+    margin-top: 1px;
+    padding: 0 4px;
+  }
+  .lab-bargraph-ylabels {
+    position: absolute;
+    left: 0;
+    top: 36px;
+    height: 100px;
+    width: 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+    font-size: 12px;
+    color: #6b7c74;
+    pointer-events: none;
+    z-index: 2;
+    gap: 12px;
+  }
+  .badge {
+    display:inline-block;
+    background:var(--accent2);
+    color:#fff;
+    font-size:12px;
+    border-radius:6px;
+    padding:2px 8px;
+    margin-left:8px;
+    font-weight:600;
+    vertical-align:middle;
+  }
+  .danger { color:var(--danger); }
+  .success { color:var(--accent); }
+  .footer {
+    text-align:center;
+    color:var(--muted);
+    font-size:13px;
+    margin:18px 0 8px 0;
+    letter-spacing:0.5px;
+    background:var(--card);
+    border-radius:8px;
+    padding:8px 0;
+    box-shadow:0 2px 8px #0001;
+  }
+  .notif {
+    background: var(--card);
+    color: var(--accent);
+    border-left: 4px solid var(--accent2);
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    box-shadow: 0 2px 8px #0001;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .notif .icon { font-size:18px; }
+  .map-section {
+    background: var(--glass);
+    border-radius: 12px;
+    padding: 0;
+    box-shadow: 0 2px 8px #0001;
+    overflow: hidden;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    min-width: 220px;
+    max-width: 500px;
+  }
+  #map {
+    width: 100%;
+    height: 220px;
+    min-height: 120px;
+    border: none;
+    border-radius: 0 0 12px 12px;
+    margin: 0;
+  }
+  .map-title {
+    background: var(--accent2);
+    color: #fff;
+    padding: 10px 0;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 12px 12px 0 0;
+    letter-spacing: 0.5px;
+  }
+  .map-controls {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    padding:8px 10px;
+    background:var(--card);
+    border-top:1px solid #e3efe7;
+  }
+  .map-controls .hint { font-size:12px; color:var(--muted); }
+  #showMyLocBtn { width:auto; padding:6px 10px; font-size:13px; background:#222; color:#fff; border: 1px solid #444; border-radius: 8px; cursor: pointer; }
+  .search-section { background: var(--glass); padding:12px; border-radius:12px; box-shadow:0 2px 8px #0001; }
+  .search-row { display:flex; gap:8px; flex-wrap:wrap; }
+  .search-row input { flex:1 1 220px; }
+  .search-row select { width:auto; }
+  #searchResults { list-style:none; margin:8px 0 0 0; padding:0; max-height:140px; overflow:auto; border-top:1px dashed #e3efe7; }
+  #searchResults li { padding:6px 0; cursor:pointer; border-bottom:1px dashed #e3efe7; }
+  #placeReports { margin-top:8px; }
+  .report-badge { display:inline-block; padding:2px 6px; border-radius:6px; color:#fff; font-size:12px; }
+  .report-card { background: var(--card); border:1px solid #e3efe7; border-radius:8px; padding:10px; margin-top:8px; box-shadow:0 2px 8px #0001; }
+  @media (max-width:900px){
+    .dashboard-flex{flex-direction:column;}
+    .left-panel,.right-panel{max-width:100vw;}
+    .map-section{margin-top:10px;}
+  }
+  @media (max-width:600px){
+    .card{width:98vw;padding:18px;}
+    main{padding:6px;}
+    section{min-width:180px;}
+    header{padding:8px 6px;}
+    .lab-bargraph-container{max-width:99vw;}
+    .lab-bargraph{height:80px;}
+    .map-section{min-width:180px;}
+    #map{height:120px;}
+    .lab-bargraph-ylabels{font-size:10px;}
+  }
+</style>
+</head>
+<body>
+
+  <!-- Splash (visible first) -->
+  <div id="splash">
+    <div id="logo">RH</div>
+    <h1 data-en="Rural Hydras" data-as="গ্ৰাম্য হাইড্ৰাছ">Rural Hydras</h1>
+    <p data-en="Empowering Rural Water Safety" data-as="গ্ৰাম্য পানী সুৰক্ষা সবলীকৰণ">Empowering Rural Water Safety</p>
+  </div>
+
+  <!-- Verify screen -->
+  <div id="verify" aria-hidden="true">
+    <div class="card">
+      <h2 data-en="Sign In" data-as="লগ ইন কৰক">Sign In</h2>
+      <input id="name" data-placeholder-en="Full name" data-placeholder-as="সম্পূৰ্ণ নাম" placeholder="Full name" autocomplete="name" />
+      <input id="userId" data-placeholder-en="ID / Aadhaar" data-placeholder-as="পৰিচয় / আধাৰ" placeholder="ID / Aadhaar" autocomplete="off" />
+      <input id="phone" data-placeholder-en="Phone number" data-placeholder-as="ফোন নম্বৰ" placeholder="Phone number" autocomplete="tel" />
+      <button id="btnVerify" data-en="Continue" data-as="অব্যাহত ৰাখক">Continue</button>
+      <p style="color:var(--muted);font-size:13px;margin-top:8px" data-en="(Demo: no real SMS)" data-as="(ডেমো: প্ৰকৃত SMS নাই)">(Demo: no real SMS)</p>
+    </div>
+  </div>
+
+  <!-- Govt/ASHA verification (for combined role) -->
+  <div id="govtVerify" aria-hidden="true">
+    <div class="card">
+      <h2 data-en="Verify Details" data-as="বিবৰণ যাচাই কৰক">Verify Details</h2>
+      <input id="govtFullName" data-placeholder-en="Full name" data-placeholder-as="সম্পূৰ্ণ নাম" placeholder="Full name" autocomplete="name" />
+      <input id="govtEmail" type="email" data-placeholder-en="Email ID" data-placeholder-as="ইমেইল আইডি" placeholder="Email ID" autocomplete="email" />
+      <input id="govtPhone" data-placeholder-en="Phone number" data-placeholder-as="ফোন নম্বৰ" placeholder="Phone number" autocomplete="tel" />
+      <button id="btnGovtVerify" data-en="Continue" data-as="অব্যাহত ৰাখক">Continue</button>
+    </div>
+  </div>
+
+  <!-- Department/Role selection and ID verification -->
+  <div id="dept" aria-hidden="true">
+    <div class="card">
+      <h2 data-en="Choose Department/Role" data-as="বিভাগ/ভূমিকা বাছনি কৰক">Choose Department/Role</h2>
+      <div style="text-align:left;">
+        <label style="display:inline-flex;align-items:center;gap:6px;margin-right:10px;"><input type="radio" name="orgOption" value="phed" /> <span data-en="PHED" data-as="PHED">PHED</span></label>
+        <label style="display:inline-flex;align-items:center;gap:6px;margin-right:10px;"><input type="radio" name="orgOption" value="jalshakti" /> <span data-en="Jal Shakti" data-as="জল শক্তি">Jal Shakti</span></label>
+        <label style="display:inline-flex;align-items:center;gap:6px;"><input type="radio" name="orgOption" value="asha" /> <span data-en="ASHA Worker" data-as="আশা কৰ্মী">ASHA Worker</span></label>
+      </div>
+      <div id="orgFields" style="margin-top:8px;display:none;">
+        <div id="uploadLbl" style="text-align:left;font-size:14px;margin-top:8px;" data-en="Upload ID card photo" data-as="আইডি কাৰ্ড ছবি আপলোড কৰক">Upload ID card photo</div>
+        <input id="orgIdPhoto" type="file" accept="image/*" />
+        <input id="orgIdInput" data-placeholder-en="Enter ID" data-placeholder-as="আইডি লিখক" placeholder="Enter ID" />
+      </div>
+      <button id="btnOrgContinue" data-en="Continue" data-as="অব্যাহত ৰাখক">Continue</button>
+    </div>
+  </div>
+
+  <!-- Report issue overlay (deprecated, replaced by separate page) -->
+  <div id="report" aria-hidden="true">
+    <div class="card">
+      <h2 data-en="Report an Issue" data-as="সমস্যা জনাওক">Report an Issue</h2>
+      <div style="text-align:left;font-size:14px;" data-en="Report type" data-as="প্ৰতিবেদনৰ ধৰণ">Report type</div>
+      <div style="text-align:left;display:flex;gap:10px;flex-wrap:wrap;">
+        <label style="display:inline-flex;align-items:center;gap:6px;"><input type="radio" name="reportType" value="health" /> <span data-en="Health" data-as="স্বাস্থ্য">Health</span></label>
+        <label style="display:inline-flex;align-items:center;gap:6px;"><input type="radio" name="reportType" value="water" /> <span data-en="Water" data-as="পানী">Water</span></label>
+      </div>
+      <textarea id="reportText" data-placeholder-en="Describe the issue..." data-placeholder-as="সমস্যাটো বৰ্ণনা কৰক..." placeholder="Describe the issue..."></textarea>
+      <div style="display:flex;gap:8px;align-items:center;justify-content:flex-start;">
+        <button id="reportVoiceBtn" style="width:auto;">Record voice</button>
+        <span id="reportVoiceStatus" style="font-size:12px;color:var(--muted);"></span>
+      </div>
+      <div style="text-align:left;font-size:14px;margin-top:6px;" data-en="Attach photo" data-as="ফটো সংলগ্ন কৰক">Attach photo</div>
+      <input id="reportPhoto" type="file" accept="image/*" capture="environment" />
+      <div style="display:flex;gap:8px;justify-content:space-between;">
+        <button id="reportSubmitBtn" data-en="Submit" data-as="জমা কৰ��">Submit</button>
+        <button id="reportCancelBtn" data-en="Cancel" data-as="বাতিল" style="background:#e3efe7;color:var(--dark);">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Role selection -->
+  <div id="role" aria-hidden="true">
+    <div class="card">
+      <h2 data-en="Choose Role" data-as="ভূমিকা নিৰ্বাচন কৰক">Choose Role</h2>
+      <select id="roleSelect">
+        <option value="" data-en="-- choose role --" data-as="-- ভূমিকা নিৰ্বাচন কৰক --">-- choose role --</option>
+        <option value="user" data-en="User + Clinic" data-as="ব্যৱহাৰকাৰী + ক্লিনিক">User + Clinic</option>
+        <option value="combined" data-en="ASHA Worker + Government" data-as="আশা কৰ্মী + চৰকাৰ">ASHA Worker + Government</option>
+      </select>
+      <button id="btnRole" data-en="Continue" data-as="অব্যাহত ৰাখক">Continue</button>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard" aria-hidden="true">
+    <div class="dash-wrapper">
+      <header>
+        <div class="user-info">
+          <button id="backBtn" data-en="← Back" data-as="← উভতি যাওক" style="padding:8px 12px;border-radius:8px;background:#222;color:#fff;border:1px solid #444;cursor:pointer">← Back</button>
+          <span class="avatar" id="avatar">U</span>
+          <span id="welcome"></span>
+        </div>
+        <div>
+          <select id="langSelect" class="lang-select" title="Language">
+            <option value="en">English</option>
+            <option value="as">Assamese</option>
+            <option value="bn">Bengali</option>
+            <option value="bodo">Bodo</option>
+            <option value="mni">Manipuri</option>
+            <option value="mizo">Mizo</option>
+            <option value="ne">Nepali</option>
+            <option value="or">Odia</option>
+            <option value="si">Sikkimese</option>
+            <option value="ti">Tibetan</option>
+            <option value="tr">Tripuri</option>
+          </select>
+        </div>
+      </header>
+      <main id="dashContent"></main>
+    </div>
+  </div>
+
+  <!-- Debug box -->
+  <div id="debug" role="status"></div>
+  <div class="footer">
+    <span data-en="&copy; 2025 Rural Hydras" data-as="&copy; ২০২৫ গ্ৰাম্য হাইড্ৰাছ">&copy; 2025 Rural Hydras</span> | 
+    <a href="mailto:support@ruralhydras.com" style="color:#06b6d4;text-decoration:none;" data-en="Contact Support" data-as="সহায়তাৰ সৈতে যোগাযোগ কৰক">Contact Support</a>
+  </div>
+
+<script>
+(function(){
+  try{
+    const splash = document.getElementById('splash');
+    const verify = document.getElementById('verify');
+    const role = document.getElementById('role');
+    const dashboard = document.getElementById('dashboard');
+    const btnVerify = document.getElementById('btnVerify');
+    const btnRole = document.getElementById('btnRole');
+    const roleSelect = document.getElementById('roleSelect');
+    const backBtn = document.getElementById('backBtn');
+    const welcome = document.getElementById('welcome');
+    const debugBox = document.getElementById('debug');
+    const dashContent = document.getElementById('dashContent');
+    const langSelect = document.getElementById('langSelect');
+    const avatar = document.getElementById('avatar');
+    // New elements for Govt/ASHA flow
+    const govtVerify = document.getElementById('govtVerify');
+    const btnGovtVerify = document.getElementById('btnGovtVerify');
+    const dept = document.getElementById('dept');
+    const btnOrgContinue = document.getElementById('btnOrgContinue');
+    const orgFields = document.getElementById('orgFields');
+    const orgIdInput = document.getElementById('orgIdInput');
+    const orgIdPhoto = document.getElementById('orgIdPhoto');
+
+    let currentLang = 'en';
+    try {
+      const lastLoc = JSON.parse(localStorage.getItem('RH_LAST_LOC') || 'null');
+      if (lastLoc && typeof lastLoc.lat === 'number' && typeof lastLoc.lon === 'number') {
+        window.__RH_location = lastLoc;
+      }
+    } catch(_) {}
+
+    // Translation function
+    function updateLanguage(lang) {
+      currentLang = lang;
+      const elements = document.querySelectorAll('[data-' + lang + ']');
+      elements.forEach(el => {
+        const translation = el.getAttribute('data-' + lang);
+        if (translation) {
+          if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+            el.placeholder = translation;
+          } else {
+            el.innerHTML = translation;
+          }
+        }
+      });
+
+      // Update placeholders
+      const placeholderElements = document.querySelectorAll('[data-placeholder-' + lang + ']');
+      placeholderElements.forEach(el => {
+        const translation = el.getAttribute('data-placeholder-' + lang);
+        if (translation) {
+          el.placeholder = translation;
+        }
+      });
+
+      // Update select options
+      const options = document.querySelectorAll('option[data-' + lang + ']');
+      options.forEach(option => {
+        const translation = option.getAttribute('data-' + lang);
+        if (translation) {
+          option.textContent = translation;
+        }
+      });
+    }
+
+    // Translations object for dynamic content
+    const translations = {
+      en: {
+        labReports: "Lab Reports (public)",
+        live: "Live",
+        healthCases: "Health Cases",
+        clinic: "Clinic",
+        announcements: "Announcements",
+        new: "New",
+        waterQualityMap: "Water Quality Map",
+        aiRecommendation: "AI Recommendation",
+        askAI: "Ask AI",
+        aiPlaceholder: "Ask Apna AI about water, health, or reports...",
+        postAnnouncement: "Post Announcement",
+        writeAnnouncement: "Write announcement...",
+        safe: "Safe",
+        warning: "Warning",
+        unsafe: "Unsafe",
+        tip: "Tip",
+        tipText: "If any value is unsafe, boil water, filter, or avoid drinking.",
+        reminder: "Reminder",
+        reminderText: "Report any water-borne disease spikes to authorities.",
+        redMarker: "Red marker",
+        blueMarker: "Blue marker",
+        redMarkerText: "Unsafe water (Pond B, Ward 3)",
+        blueMarkerText: "Safe water sources",
+        case001: "Case #001 — Mild gastroenteritis (possible water link)",
+        case002: "Case #002 — Scheduled screening",
+        announcement1: "Heavy rain alert for next 48 hours.",
+        announcement2: "Water quality training on Friday 3 PM.",
+        userClinic: "User + Clinic",
+        ashaWorkerGov: "ASHA Worker + Government",
+        nearbyReports: "Nearby Reports",
+        enableLocationHint: "Enable location to see nearby sources.",
+        retry: "Retry",
+        km: "km",
+        away: "away",
+        noLocation: "Location not available",
+        source: "Source",
+        searchLocation: "Search location",
+        search: "Search",
+        govtMode: "Government",
+        userMode: "User",
+        reportsFor: "Reports for",
+        showMyLocation: "Show My Location",
+        searching: "Searching...",
+        noResults: "No results",
+        selectAResult: "Select a result to view reports and center the map.",
+        householdsAffected: "Households affected",
+        sourcesTested: "Sources tested",
+        lastUpdated: "Last updated",
+        queryPlaceholder: "Type village, town, district, or state",
+        mode: "Mode",
+        markerHere: "Marker shows your location.",
+        youAreHere: "You are here",
+        showInLab: "Show in Lab Reports",
+        reset: "Reset",
+        downloadJSON: "Download JSON",
+        currentSource: "Current source",
+        cloudAI: "Use Cloud AI",
+        provider: "Provider",
+        apiKey: "API key",
+        save: "Save",
+        usingCloud: "Using Cloud AI",
+        offlineAI: "Using offline AI",
+        settingsSaved: "Settings saved",
+        clearKey: "Clear Key",
+        verifyDetailsTitle: "Verify Details",
+        email: "Email ID",
+        chooseDeptRole: "Choose Department/Role",
+        phed: "PHED",
+        jalShakti: "Jal Shakti",
+        ashaWorker: "ASHA Worker",
+        uploadIdCard: "Upload ID card photo",
+        enterPhedId: "Enter PHED ID",
+        enterJalShaktiId: "Enter Jal Shakti ID",
+        enterAshaId: "Enter ASHA ID",
+        pleaseFillDetails: "Please fill full name, email, and phone.",
+        selectDeptOption: "Select one option: PHED, Jal Shakti, or ASHA Worker.",
+        needPhotoAndId: "Please upload ID card photo and enter ID.",
+        sendReport: "Send Report",
+        reportIssue: "Report an Issue",
+        reportType: "Report type",
+        health: "Health",
+        water: "Water",
+        describeIssue: "Describe the issue...",
+        attachPhoto: "Attach photo",
+        recordVoice: "Record voice",
+        stop: "Stop",
+        submit: "Submit",
+        cancel: "Cancel",
+        reportSent: "Report sent",
+        pleaseSelectType: "Please select Health or Water.",
+        pleaseAddTextOrPhoto: "Please add a description or attach a photo.",
+        govtLogin: "Government Login",
+        delete: "Delete",
+        uploadLabReport: "Upload Lab Report",
+        photo: "Photo",
+        notes: "Notes",
+        upload: "Upload",
+        uploadSuccess: "Lab report uploaded",
+        pleaseAddPhotoAndText: "Please attach a photo and write notes."
+      },
+      as: {
+        labReports: "পৰীক্ষাগাৰৰ প্ৰতিবেদন (জনসাধাৰণৰ)",
+        live: "লাইভ",
+        healthCases: "স্বাস্থ্য ক্ষেত্ৰত",
+        clinic: "ক্লিনিক",
+        announcements: "ঘোষণাসমূহ",
+        new: "নতুন",
+        waterQualityMap: "পানীৰ মানৰ মানচিত্ৰ",
+        aiRecommendation: "AI পৰামৰ্শ",
+        askAI: "AI ক সোধক",
+        aiPlaceholder: "পানী, স্বাস্থ্য বা প্ৰতিবেদনৰ বিষয়ে আপোনাৰ AI ক সোধক...",
+        postAnnouncement: "ঘোষণা প্ৰকাশ কৰক",
+        writeAnnouncement: "ঘোষণা লিখক...",
+        safe: "সুৰক্ষিত",
+        warning: "সতৰ্কতা",
+        unsafe: "অসুৰক্ষিত",
+        tip: "টিপছ",
+        tipText: "যদি কোনো মান অসুৰক্ষিত হয়, পানী উতলাওক, ফিল্টাৰ কৰক বা খোৱাৰ পৰা বিৰত থাকক।",
+        reminder: "স্মাৰকপত্ৰ",
+        reminderText: "যিকোনো পানীজনিত ৰোগৰ বৃদ্ধি কৰ্তৃপক্ষক জনাওক।",
+        redMarker: "ৰঙা চিহ্ন",
+        blueMarker: "নীলা চিহ্ন",
+        redMarkerText: "অসুৰক্ষিত পানী (পুখুৰী বি, ৱাৰ্ড ৩)",
+        blueMarkerText: "সুৰক্ষিত পানীৰ উৎস",
+        case001: "ক্ষেত্ৰ #০০১ — মৃদু গেষ্ট্ৰোএণ্টেৰাইটিছ (সম্ভাব্য পানীৰ সংযোগ)",
+        case002: "ক্ষেত্ৰ #০০২ — নিৰ্ধাৰিত স্ক্ৰীনিং",
+        announcement1: "পৰৱৰ্তী ৪৮ ঘণ্টাৰ বাবে প্ৰবল বৰষুণৰ সতৰ্কবাণী।",
+        announcement2: "শুক্ৰবাৰে বিয়লি ৩ বজাত পানীৰ মানদণ্ড প্ৰশিক্ষণ।",
+        userClinic: "ব্যৱহাৰকাৰী + ক্লিনিক",
+        ashaWorkerGov: "আশা কৰ্মী + চৰকাৰ",
+        nearbyReports: "ওচৰৰ প্ৰতিবেদন",
+        enableLocationHint: "ওচৰৰ উৎস দেখিবলৈ অৱস্থান অনুমতি দিয়ক।",
+        retry: "পুনৰ চেষ্টা কৰক",
+        km: "কিমি",
+        away: "দূৰত",
+        noLocation: "অৱস্থান উপলব্ধ নহয়",
+        source: "উৎস",
+        searchLocation: "অবস্থান বিচাৰক",
+        search: "সন্ধান কৰক",
+        govtMode: "চৰকাৰ",
+        userMode: "ব্যৱহাৰকাৰী",
+        reportsFor: "অঞ্চলৰ প্ৰতিবেদন",
+        showMyLocation: "মোৰ অৱস্থান দেখুৱাওক",
+        searching: "বিচাৰি আছে...",
+        noResults: "কোনো ফলাফল নাই",
+        selectAResult: "মানচিত্ৰ কেন্দ্ৰ কৰিবলৈ আৰু প্ৰতিবেদন দেখিবলৈ ফলা��ল এটা বাছনি কৰক।",
+        householdsAffected: "প্ৰভাৱিত গৃহস্থালি",
+        sourcesTested: "পরীক্ষিত উৎস",
+        lastUpdated: "শেহতীয়া আপডেট",
+        queryPlaceholder: "গাঁও, চহৰ, জিলা বা ৰাজ্য লিখক",
+        mode: "ধৰণ",
+        markerHere: "চিহ্ন আপোনাৰ অৱস্থান দেখুৱাই।",
+        youAreHere: "আপুনি ইয়াত আছেন",
+        showInLab: "ল্যাব প্ৰতিবেদনত দেখুৱাওক",
+        reset: "ৰিছেট",
+        downloadJSON: "JSON ডাউনলোড",
+        currentSource: "বৰ্তমান উৎস",
+        cloudAI: "Cloud AI ব্যৱহাৰ কৰক",
+        provider: "প্ৰদানকাৰী",
+        apiKey: "API key",
+        save: "সংৰক্ষণ কৰক",
+        usingCloud: "Cloud AI ব্যৱহৃত",
+        offlineAI: "অফলাইন AI ব্যৱহৃত",
+        settingsSaved: "ছেটিংছ সংৰক্ষণ হৈ গ'ল",
+        clearKey: "কি মচাওক",
+        verifyDetailsTitle: "বিবৰণ যাচাই কৰক",
+        email: "ইমেইল আইডি",
+        chooseDeptRole: "বিভাগ/ভূমিকা বাছনি কৰক",
+        phed: "PHED",
+        jalShakti: "জল শক্তি",
+        ashaWorker: "আশা কৰ্মী",
+        uploadIdCard: "আইডি কাৰ্ড ছবি আপলোড কৰক",
+        enterPhedId: "PHED ID লিখক",
+        enterJalShaktiId: "Jal Shakti ID লিখক",
+        enterAshaId: "ASHA ID লিখক",
+        pleaseFillDetails: "অনুগ্ৰহ কৰি সম্পূৰ্ণ নাম, ইমেইল আৰু ফোন পূৰণ কৰক।",
+        selectDeptOption: "PHED, Jal Shakti বা ASHA Worker মধ্যৰ পৰা এটা বাছনি কৰক।",
+        needPhotoAndId: "অনুগ্ৰহ কৰি আইডি কাৰ্ডৰ ছবি আপলোড কৰক আৰু আ���ডি লিখক।",
+        sendReport: "প্ৰতিবেদন পঠাওক",
+        reportIssue: "সমস্যা জনাওক",
+        reportType: "প্ৰতিবেদনৰ ধৰণ",
+        health: "স্বাস্থ্য",
+        water: "পানী",
+        describeIssue: "সমস্যাটো বৰ্ণনা কৰক...",
+        attachPhoto: "ফটো সংলগ্ন কৰক",
+        recordVoice: "ভয়েছ ৰেকৰ্ড কৰক",
+        stop: "বন্ধ কৰক",
+        submit: "জমা কৰক",
+        cancel: "বাতিল",
+        reportSent: "প্ৰতিবেদন পঠোৱা হ'ল",
+        pleaseSelectType: "অনুগ্ৰহ কৰি স্বাস্থ্য বা পানীৰ ধৰণ বাছনি কৰক।",
+        pleaseAddTextOrPhoto: "অনুগ্ৰহ কৰি বৰ্ণনা লিখক বা ফটো সংলগ্ন ��ৰক।",
+        govtLogin: "চৰকাৰী লগিন",
+        delete: "মচি পেলাওক",
+        uploadLabReport: "ল্যাব প্ৰতিবেদন আপলোড",
+        photo: "ফটো",
+        notes: "টীকা",
+        upload: "আপলোড",
+        uploadSuccess: "ল্যাব প্ৰতিবেদন আপলোড কৰা হ'ল",
+        pleaseAddPhotoAndText: "অনুগ্ৰহ কৰি ফটো সংলগ্ন কৰক আৰু টীকা লিখক।"
+      }
+    };
+
+    // Session helpers for cross-page persistence
+    function getSessionUser(){
+      try { return JSON.parse(localStorage.getItem('RH_USER')||'null'); } catch(_){ return null; }
+    }
+    function setSessionUser(u){
+      try { localStorage.setItem('RH_USER', JSON.stringify(u||{})); } catch(_){ }
+    }
+    function setResumeFlag(){
+      try { localStorage.setItem('RH_RESUME_DASH','true'); } catch(_){ }
+    }
+    function clearResumeFlag(){
+      try { localStorage.removeItem('RH_RESUME_DASH'); } catch(_){ }
+    }
+
+    // Announcements are stored in localStorage so all users see the same
+    function getAnnouncements() {
+      let anns = [];
+      try {
+        anns = JSON.parse(localStorage.getItem('RH_ANNOUNCEMENTS') || '[]');
+      } catch { anns = []; }
+      if (!Array.isArray(anns)) anns = [];
+      // Default announcements if none exist
+      if (anns.length === 0) {
+        anns = [
+          translations[currentLang].announcement1,
+          translations[currentLang].announcement2
+        ];
+        localStorage.setItem('RH_ANNOUNCEMENTS', JSON.stringify(anns));
+      }
+      return anns;
+    }
+    function setAnnouncements(anns) {
+      localStorage.setItem('RH_ANNOUNCEMENTS', JSON.stringify(anns));
+    }
+
+    // Lab report data for the bar graph (show only current/latest)
+    // ph high (red), turbidity slightly high (yellow), oxygen low (red), nitrate normal (green), chlorine high (red)
+    let labData = [
+      { location: "Today", date: "Today", ph: 9.2, turbidity: 6.2, oxygen: 3.5, nitrate: 7, chlorine: 1.2 }
+    ];
+
+    function getStatus(param, value) {
+      if(param === "ph") {
+        if(value < 6.5 || value > 8.5) return "danger";
+        return "success";
+      }
+      if(param === "turbidity") {
+        if(value > 7) return "danger";
+        if(value > 5) return "warn";
+        return "success";
+      }
+      if(param === "oxygen") {
+        if(value < 4) return "danger";
+        if(value < 5) return "warn";
+        return "success";
+      }
+      if(param === "nitrate") {
+        if(value > 15) return "danger";
+        if(value > 10) return "warn";
+        return "success";
+      }
+      if(param === "chlorine") {
+        if(value > 1) return "danger";
+        if(value > 0.5) return "warn";
+        return "success";
+      }
+      return "success";
+    }
+
+    function getColor(status) {
+      if(status === "danger") return "#e11d48";
+      if(status === "warn") return "#eab308";
+      return "#16a34a";
+    }
+
+    function labBarGraphHTML() {
+      const params = [
+        { key: "ph", label: "pH", max: 12 },
+        { key: "turbidity", label: "Turbidity", max: 10 },
+        { key: "oxygen", label: " Oxygen", max: 10 },
+        { key: "nitrate", label: "Nitrate", max: 20 },
+        { key: "chlorine", label: "Chlorine", max: 2 }
+      ];
+      const row = labData[0];
+      const W = 320, H = 120, pad = 36, barW = 32, gap = 18;
+      let svgBars = '';
+      params.forEach((p, i) => {
+        const x = pad + i * (barW + gap);
+        const val = row[p.key];
+        const h = Math.max(6, (val / p.max) * (H - 18));
+        const status = getStatus(p.key, val);
+        const color = getColor(status);
+        svgBars += `<rect x="${x}" y="${H-h}" width="${barW}" height="${h}" fill="${color}" rx="6">
+          <title>${p.label}: ${val}</title>
+        </rect>
+        <text x="${x + barW/2}" y="${H-h-6}" text-anchor="middle" font-size="13" fill="${color}" font-weight="bold">${val}</text>`;
+      });
+      return `
+        <div class="lab-bargraph-container" style="position:relative;">
+          <div class="lab-bargraph-legend">
+            <span><span class="legend-dot" style="background:#16a34a"></span>${translations[currentLang].safe}</span>
+            <span><span class="legend-dot" style="background:#eab308"></span>${translations[currentLang].warning}</span>
+            <span><span class="legend-dot" style="background:#e11d48"></span>${translations[currentLang].unsafe}</span>
+          </div>
+          <div class="lab-bargraph-ylabels">
+            <span>12</span>
+            <span>6</span>
+            <span>0</span>
+          </div>
+          <svg class="lab-bargraph" width="${W}" height="${H}">
+            ${svgBars}
+            <text x="${pad + barW/2}" y="${H+18}" text-anchor="middle" font-size="13">pH</text>
+            <text x="${pad + barW + gap + barW/2}" y="${H+18}" text-anchor="middle" font-size="13">Turbidity</text>
+            <text x="${pad + 2*(barW+gap) + barW/2}" y="${H+18}" text-anchor="middle" font-size="13">Oxygen</text>
+            <text x="${pad + 3*(barW+gap) + barW/2}" y="${H+18}" text-anchor="middle" font-size="13">Nitrate</text>
+            <text x="${pad + 4*(barW+gap) + barW/2}" y="${H+18}" text-anchor="middle" font-size="13">Chlorine</text>
+          </svg>
+        </div>
+      `;
+    }
+
+    function renderLabGraph() {
+      const mount = document.getElementById('labGraphMount');
+      if (mount) mount.innerHTML = labBarGraphHTML();
+    }
+
+    function updateLabSourceTag() {
+      try{
+        const tag = document.getElementById('labSourceTag');
+        if (!tag) return;
+        const row = (Array.isArray(labData) && labData[0]) ? labData[0] : null;
+        const name = row && row.location ? row.location : 'Today';
+        tag.textContent = `${translations[currentLang].currentSource}: ${name}`;
+      } catch(_){ }
+    }
+
+    function saveLabSnapshot(name, params) {
+      try { localStorage.setItem('RH_LAB_SNAPSHOT', JSON.stringify({ name, params, ts: Date.now() })); } catch(_){ }
+    }
+    function loadLabSnapshot() {
+      try { const raw = localStorage.getItem('RH_LAB_SNAPSHOT'); if (!raw) return null; const obj = JSON.parse(raw); if (!obj || !obj.params) return null; return obj; } catch(_){ return null; }
+    }
+    function applyLabToGraph(name, params, persist = true) {
+      try{
+        labData[0] = { location: name || 'Selected', date: 'Today', ph: params.ph, turbidity: params.turbidity, oxygen: params.oxygen, nitrate: params.nitrate, chlorine: params.chlorine };
+        renderLabGraph();
+        updateLabSourceTag();
+        if (persist) saveLabSnapshot(name, params);
+      } catch(e){ console.warn('applyLabToGraph failed', e); }
+    }
+    function resetLabReports() {
+      try{
+        try { localStorage.removeItem('RH_LAB_SNAPSHOT'); } catch(_){ }
+        if (window.__RH_location && typeof window.__RH_location.lat === 'number') {
+          updateFromLocation(window.__RH_location.lat, window.__RH_location.lon);
+        } else {
+          labData[0] = { location: 'Today', date: 'Today', ph: 9.2, turbidity: 6.2, oxygen: 3.5, nitrate: 7, chlorine: 1.2 };
+        }
+        renderLabGraph();
+        updateLabSourceTag();
+      } catch(e){ console.warn('resetLabReports failed', e); }
+    }
+    function downloadCurrentLabJSON() {
+      try{
+        const row = (Array.isArray(labData) && labData[0]) ? labData[0] : {};
+        const data = { source: row.location || 'N/A', date: row.date || 'N/A', ph: row.ph, turbidity: row.turbidity, oxygen: row.oxygen, nitrate: row.nitrate, chlorine: row.chlorine };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'lab-report.json';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 0);
+      } catch(e){ console.warn('downloadCurrentLabJSON failed', e); }
+    }
+
+    function mapSectionHTML() {
+      const hasLoc = !!(window.__RH_location && typeof window.__RH_location.lat === 'number' && typeof window.__RH_location.lon === 'number');
+      const hasTarget = !!(window.__RH_searchTarget && typeof window.__RH_searchTarget.lat === 'number' && typeof window.__RH_searchTarget.lon === 'number');
+      const target = hasTarget ? window.__RH_searchTarget : (hasLoc ? window.__RH_location : null);
+      const bbox = target ? computeBBox(target.lat, target.lon, 6) : (window.__RH_mapBBox || "91.7,26.1,92.1,26.3");
+      const markerParam = target ? `&marker=${target.lat},${target.lon}` : '';
+      const hint = target && hasLoc && target === window.__RH_location
+        ? translations[currentLang].markerHere
+        : (hasTarget ? `${translations[currentLang].reportsFor} ${window.__RH_searchName || ''}` : '');
+      const info = target ? `<div style="font-size:12px;color:var(--muted);padding:7px 12px;">${hasTarget ? '' : translations[currentLang].youAreHere}: ${target.lat.toFixed(4)}, ${target.lon.toFixed(4)}</div>` : '';
+      return `
+        <div class="map-section">
+          <div class="map-title">${translations[currentLang].waterQualityMap}</div>
+          <iframe id="map" src="https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik${markerParam}" allowfullscreen loading="lazy"></iframe>
+          <div class="map-controls">
+            <div class="hint">${hint}</div>
+            ${hasLoc ? `<button id="showMyLocBtn">${translations[currentLang].showMyLocation}</button>` : ''}
+          </div>
+          ${info}
+        </div>
+      `;
+    }
+
+    // Nearby reports helpers and section
+    function computeDistanceKm(lat1, lon1, lat2, lon2) {
+      function toRad(d){ return d * Math.PI / 180; }
+      const R = 6371;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+    function statusFromScore(score){
+      if (score >= 0.7) return 'success';
+      if (score >= 0.45) return 'warn';
+      return 'danger';
+    }
+    function generateNearbySources() {
+      if (!(window.__RH_location && typeof window.__RH_location.lat === 'number' && typeof window.__RH_location.lon === 'number')) return [];
+      const { lat, lon } = window.__RH_location;
+      const offsets = [
+        { name: 'A', dlat: 0.010, dlon: 0.006 },
+        { name: 'B', dlat: -0.008, dlon: 0.005 },
+        { name: 'C', dlat: 0.006, dlon: -0.007 },
+        { name: 'D', dlat: -0.012, dlon: -0.004 },
+        { name: 'E', dlat: 0.004, dlon: 0.010 }
+      ];
+      return offsets.map((o, i) => {
+        const slat = lat + o.dlat;
+        const slon = lon + o.dlon;
+        const dist = computeDistanceKm(lat, lon, slat, slon);
+        // Deterministic score based on position
+        const base = ((Math.abs(slat*3.73) + Math.abs(slon*5.19)) % 1);
+        const score = Math.max(0, Math.min(1, 1 - Math.abs(base - 0.6) - i*0.05));
+        return {
+          id: i,
+          name: `${translations[currentLang].source} ${o.name}`,
+          lat: slat,
+          lon: slon,
+          distanceKm: dist,
+          status: statusFromScore(score)
+        };
+      }).sort((a,b)=>a.distanceKm-b.distanceKm);
+    }
+    function nearbyReportsSectionHTML(roleName) {
+      if (roleName !== 'user') return '';
+      const hasLoc = !!(window.__RH_location && typeof window.__RH_location.lat === 'number' && typeof window.__RH_location.lon === 'number');
+      if (!hasLoc) {
+        return `
+          <section>
+            <h3>${translations[currentLang].nearbyReports}</h3>
+            <div class="notif"><span class="icon">📍</span>${translations[currentLang].enableLocationHint}</div>
+            <button id="locRetryBtn">${translations[currentLang].retry}</button>
+            <div style="font-size:12px;color:var(--muted);margin-top:6px;">${translations[currentLang].noLocation}</div>
+          </section>
+        `;
+      }
+      const sources = generateNearbySources();
+      const items = sources.map(s=>{
+        const distTxt = `${s.distanceKm.toFixed(1)} ${translations[currentLang].km} ${translations[currentLang].away}`;
+        const color = s.status==='success' ? 'var(--accent)' : (s.status==='warn' ? 'var(--warn)' : 'var(--danger)');
+        const label = s.status==='success' ? translations[currentLang].safe : (s.status==='warn' ? translations[currentLang].warning : translations[currentLang].unsafe);
+        return `<li style="display:flex;justify-content:space-between;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed #e3efe7;">
+          <span>${s.name} <span style="color:var(--muted);font-size:12px">(${distTxt})</span></span>
+          <span class="badge" style="background:${color};">${label}</span>
+        </li>`;
+      }).join('');
+      return `
+        <section>
+          <h3>${translations[currentLang].nearbyReports}</h3>
+          <ul style="list-style:none;margin:0;padding:0">${items}</ul>
+        </section>
+      `;
+    }
+
+    function sendReportSectionHTML(roleName){
+      if (roleName !== 'user') return '';
+      return `
+        <section>
+          <h3>${translations[currentLang].reportIssue}</h3>
+          <a id="sendReportBtn" href="./report.html" style="display:inline-block;text-decoration:none;">
+            <button style="width:auto;">${translations[currentLang].sendReport}</button>
+          </a>
+        </section>
+      `;
+    }
+
+    function govtLoginSectionHTML(roleName){
+      if (roleName !== 'user') return '';
+      return `
+        <section>
+          <h3>${translations[currentLang].govtMode}</h3>
+          <button id="govtLoginBtn" style="width:auto;">${translations[currentLang].govtLogin}</button>
+        </section>
+      `;
+    }
+
+    function govtUploadSectionHTML(roleName){
+      if (roleName !== 'combined') return '';
+      return `
+        <section>
+          <h3>${translations[currentLang].uploadLabReport}</h3>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <label style="text-align:left;font-size:14px;">${translations[currentLang].photo}</label>
+            <input id="labUploadPhoto" type="file" accept="image/*" capture="environment" />
+            <label style="text-align:left;font-size:14px;">${translations[currentLang].notes}</label>
+            <textarea id="labUploadText" placeholder="${translations[currentLang].notes}"></textarea>
+            <button id="labUploadBtn" style="width:auto;align-self:flex-start;">${translations[currentLang].upload}</button>
+          </div>
+        </section>
+      `;
+    }
+
+    function aiRecommendationSectionHTML() {
+      return `
+        <section>
+          <h3>${translations[currentLang].aiRecommendation}</h3>
+          <div class="ai-settings" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px;">
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px;">
+              <input type="checkbox" id="aiCloudToggle" /> ${translations[currentLang].cloudAI}
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px;">
+              ${translations[currentLang].provider}
+              <select id="aiProvider" style="width:auto;padding:6px 10px;font-size:13px;">
+                <option value="openai">OpenAI</option>
+                <option value="openrouter">OpenRouter</option>
+                <option value="gemini">Gemini</option>
+              </select>
+            </label>
+            <input id="aiApiKey" type="password" placeholder="${translations[currentLang].apiKey}" style="flex:1 1 220px;" />
+            <button id="aiSaveCfg" style="width:auto;padding:6px 10px;font-size:13px;">${translations[currentLang].save}</button>
+            <button id="aiClearKey" style="width:auto;padding:6px 10px;font-size:13px;background:#222;color:#fff;border:1px solid #444;border-radius:8px;cursor:pointer;">${translations[currentLang].clearKey}</button>
+            <span id="aiCfgStatus" style="font-size:12px;color:var(--muted);"></span>
+          </div>
+          <div class="ai-box">
+            <textarea id="aiInput" placeholder="${translations[currentLang].aiPlaceholder}"></textarea>
+            <div class="ai-controls">
+              <button id="aiAskBtn">${translations[currentLang].askAI}</button>
+              <button id="aiVoiceBtn" title="Speak your question">🎤</button>
+              <button id="aiSpeakOutBtn" title="Read answer aloud">🔊</button>
+              <a href="https://gemini.google.com/gem/f0fe2ea14ae7/12faaf589ddcac0a" target="_blank">Apna AI</a>
+            </div>
+            <div id="aiOutput" style="margin-top:8px;color:var(--accent)"></div>
+          </div>
+        </section>
+      `;
+    }
+
+    function loadDashboard(roleName){
+      if (roleName === "user" && window.__RH_location) {
+        updateFromLocation(window.__RH_location.lat, window.__RH_location.lon);
+      }
+      let announcementSection = `
+        <section>
+          <h3>${translations[currentLang].announcements} <span class="badge" style="background:var(--accent)">${translations[currentLang].new}</span></h3>
+          <ul id="villagerAnnouncements" style="font-size:13px"></ul>
+        </section>
+      `;
+      // If government/worker, add announcement input
+      if(roleName === "combined") {
+        announcementSection = `
+          <section>
+            <h3>${translations[currentLang].announcements} <span class="badge" style="background:var(--accent)">${translations[currentLang].new}</span></h3>
+            <textarea id="announceText" placeholder="${translations[currentLang].writeAnnouncement}"></textarea>
+            <button id="postAnn">${translations[currentLang].postAnnouncement}</button>
+            <ul id="villagerAnnouncements" style="font-size:13px"></ul>
+          </section>
+        `;
+      }
+      dashContent.innerHTML = `
+        <div class="dashboard-flex">
+          <div class="left-panel">
+            <section id="labSection">
+              <h3>${translations[currentLang].labReports} <span class="badge">${translations[currentLang].live}</span></h3>
+              <div id="labControls" style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin:6px 0;">
+                <div id="labSourceTag" style="font-size:12px;color:var(--muted);"></div>
+                <div style="display:flex;gap:8px;">
+                  <button id="labResetBtn" style="width:auto;padding:6px 10px;font-size:13px;background:#222;color:#fff;border:1px solid #444;border-radius:8px;cursor:pointer;">${translations[currentLang].reset}</button>
+                  <button id="labDownloadBtn" style="width:auto;padding:6px 10px;font-size:13px;">${translations[currentLang].downloadJSON}</button>
+                </div>
+              </div>
+              <div id="labGraphMount">
+                ${labBarGraphHTML()}
+              </div>
+              <div class="notif" style="font-size:12px"><span class="icon">⚠️</span> <b>${translations[currentLang].tip}:</b> ${translations[currentLang].tipText}</div>
+            </section>
+            <section>
+              <h3>${translations[currentLang].healthCases} <span class="badge" style="background:var(--accent)">${translations[currentLang].clinic}</span></h3>
+              <ul style="font-size:13px">
+                <li>${translations[currentLang].case001}</li>
+                <li>${translations[currentLang].case002}</li>
+              </ul>
+              <div class="notif"><span class="icon">🩺</span> <b>${translations[currentLang].reminder}:</b> ${translations[currentLang].reminderText}</div>
+            </section>
+            ${announcementSection}
+          </div>
+          <div class="right-panel">
+            ${sendReportSectionHTML(roleName)}
+            ${govtLoginSectionHTML(roleName)}
+            ${govtUploadSectionHTML(roleName)}
+            ${mapSectionHTML()}
+            ${locationSearchSectionHTML()}
+            ${nearbyReportsSectionHTML(roleName)}
+            ${aiRecommendationSectionHTML()}
+          </div>
+        </div>
+      `;
+      setTimeout(()=>{
+        setupAIBox();
+        loadAnnouncements();
+        setupLocationSearch();
+        const showMyLoc = document.getElementById('showMyLocBtn');
+        if (showMyLoc) {
+          showMyLoc.onclick = function(){
+            if (window.__RH_location) {
+              window.__RH_searchTarget = null;
+              window.__RH_searchName = null;
+              updateMapIframeTo(window.__RH_location.lat, window.__RH_location.lon, 6);
+            }
+          };
+        }
+        // Retry location button wiring if present
+        const retryBtn = document.getElementById('locRetryBtn');
+        if (retryBtn) {
+          retryBtn.onclick = function(){
+            requestLocationAndStore(function(){ loadDashboard(roleName); });
+            // Fallback refresh if callback not triggered due to browser permissions delay
+            setTimeout(()=>loadDashboard(roleName), 1200);
+          };
+        }
+        if(roleName === "combined") {
+          document.getElementById('postAnn').onclick = function() {
+            const txt = (document.getElementById('announceText')||{}).value || '';
+            if(!txt.trim()){ alert('Write something'); return; }
+            let anns = getAnnouncements();
+            anns.unshift(txt.trim());
+            setAnnouncements(anns);
+            (document.getElementById('announceText')||{}).value = '';
+            loadAnnouncements();
+          };
+        }
+        // Lab controls wiring and persisted snapshot
+        const labResetBtn = document.getElementById('labResetBtn');
+        if (labResetBtn) labResetBtn.onclick = resetLabReports;
+        const labDownloadBtn = document.getElementById('labDownloadBtn');
+        if (labDownloadBtn) labDownloadBtn.onclick = downloadCurrentLabJSON;
+        const snap = loadLabSnapshot();
+        if (snap) { applyLabToGraph(snap.name, snap.params, false); }
+        updateLabSourceTag();
+        // Send Report opens dedicated page; no overlay wiring
+        const glBtn = document.getElementById('govtLoginBtn');
+        if (glBtn) {
+          glBtn.onclick = function(){
+            try{
+              dashboard.classList.remove('show'); dashboard.classList.add('hidden');
+              if (govtVerify) { govtVerify.classList.remove('hidden'); govtVerify.classList.add('show'); govtVerify.setAttribute('aria-hidden','false'); }
+            }catch(e){ console.error(e); }
+          };
+        }
+        // Govt upload wiring
+        (function wireGovtUpload(){
+          const upBtn = document.getElementById('labUploadBtn');
+          const photoEl = document.getElementById('labUploadPhoto');
+          const textEl = document.getElementById('labUploadText');
+          if (!upBtn || !photoEl || !textEl) return;
+          function getUploads(){ try { return JSON.parse(localStorage.getItem('RH_GOVT_LAB_UPLOADS')||'[]'); } catch(_){ return []; } }
+          function setUploads(list){ try { localStorage.setItem('RH_GOVT_LAB_UPLOADS', JSON.stringify(list||[])); } catch(_){ } }
+          upBtn.onclick = function(){
+            try{
+              const file = photoEl.files && photoEl.files[0];
+              const txt = (textEl.value||'').trim();
+              if (!file || !txt) { alert(translations[currentLang].pleaseAddPhotoAndText); return; }
+              const reader = new FileReader();
+              reader.onload = function(){
+                const list = getUploads();
+                list.unshift({ photo: reader.result, text: txt, ts: Date.now(), by: (window.__RH_user && window.__RH_user.name) || 'Govt' });
+                setUploads(list);
+                alert(translations[currentLang].uploadSuccess);
+                photoEl.value = '';
+                textEl.value = '';
+              };
+              reader.onerror = function(){ alert('Failed to read photo'); };
+              reader.readAsDataURL(file);
+            }catch(e){ console.error(e); }
+          };
+        })();
+      }, 0);
+    }
+
+    function loadAnnouncements(){
+      const vac = document.getElementById('villagerAnnouncements');
+      let anns = getAnnouncements();
+      if(!vac){ return; }
+      const canDelete = (window.__RH_user && window.__RH_user.role === 'combined');
+      vac.innerHTML = anns.map((a,i)=>{
+        const delBtn = canDelete ? ` <button class="ann-del" data-index="${i}" style="background:#e11d48;color:#fff;border:none;border-radius:6px;padding:2px 8px;font-size:12px;cursor:pointer;">${translations[currentLang].delete}</button>` : '';
+        return `<li style="display:flex;justify-content:space-between;align-items:center;gap:10px;">${a}<span>${delBtn}</span></li>`;
+      }).join('');
+      if (canDelete) {
+        const delBtns = vac.querySelectorAll('.ann-del');
+        delBtns.forEach(btn=>{
+          btn.addEventListener('click', ()=>{
+            const idx = parseInt(btn.getAttribute('data-index'), 10);
+            if (!isNaN(idx)) {
+              const cur = getAnnouncements();
+              cur.splice(idx, 1);
+              setAnnouncements(cur);
+              loadAnnouncements();
+            }
+          });
+        });
+      }
+    }
+
+    function setupAIBox() {
+      const aiInput = document.getElementById('aiInput');
+      const aiAskBtn = document.getElementById('aiAskBtn');
+      const aiVoiceBtn = document.getElementById('aiVoiceBtn');
+      const aiSpeakOutBtn = document.getElementById('aiSpeakOutBtn');
+      const aiOutput = document.getElementById('aiOutput');
+      if (!aiInput || !aiAskBtn || !aiVoiceBtn || !aiSpeakOutBtn || !aiOutput) return;
+      const cloudToggle = document.getElementById('aiCloudToggle');
+      const aiProvider = document.getElementById('aiProvider');
+      const aiApiKey = document.getElementById('aiApiKey');
+      const aiSaveCfg = document.getElementById('aiSaveCfg');
+      const aiClearKey = document.getElementById('aiClearKey');
+      const aiCfgStatus = document.getElementById('aiCfgStatus');
+      function getAIConfig(){
+        try { return JSON.parse(localStorage.getItem('RH_AI_CFG')||'{}'); } catch(_){ return {}; }
+      }
+      function setAIConfig(cfg){
+        try { localStorage.setItem('RH_AI_CFG', JSON.stringify(cfg||{})); } catch(_){ }
+      }
+      (function initCfg(){
+        const cfg = getAIConfig();
+        if (cloudToggle) cloudToggle.checked = !!cfg.enabled;
+        if (aiProvider) aiProvider.value = cfg.provider || 'openai';
+        if (aiApiKey) aiApiKey.value = cfg.key || '';
+        if (aiCfgStatus) aiCfgStatus.textContent = cfg.enabled ? translations[currentLang].usingCloud : translations[currentLang].offlineAI;
+      })();
+      if (aiSaveCfg) aiSaveCfg.onclick = function(){
+        const cfg = getAIConfig();
+        cfg.enabled = !!(cloudToggle && cloudToggle.checked);
+        cfg.provider = aiProvider ? aiProvider.value : 'openai';
+        cfg.key = aiApiKey ? aiApiKey.value.trim() : '';
+        setAIConfig(cfg);
+        if (aiCfgStatus) aiCfgStatus.textContent = translations[currentLang].settingsSaved + (cfg.enabled ? ` — ${translations[currentLang].usingCloud}` : ` — ${translations[currentLang].offlineAI}`);
+        setTimeout(()=>{ if(aiCfgStatus) aiCfgStatus.textContent = cfg.enabled ? translations[currentLang].usingCloud : translations[currentLang].offlineAI; }, 1800);
+      };
+      if (aiClearKey) aiClearKey.onclick = function(){
+        const cfg = getAIConfig();
+        cfg.key = '';
+        setAIConfig(cfg);
+        if (aiApiKey) aiApiKey.value = '';
+        if (aiCfgStatus) aiCfgStatus.textContent = translations[currentLang].settingsSaved;
+      };
+      aiAskBtn.onclick = async function() {
+        const q = aiInput.value.trim();
+        if (!q) { 
+          aiOutput.textContent = currentLang === 'as' ? 'অনুগ্ৰহ কৰি এটা প্ৰশ্ন লিখক।' : 'Please enter a question.'; 
+          return; 
+        }
+        aiOutput.textContent = currentLang === 'as' ? 'চিন্তা কৰি আছে...' : 'Thinking...';
+        try {
+          let answer = '';
+          try {
+            const cfg = (typeof getAIConfig === 'function') ? getAIConfig() : {};
+            if (cfg && cfg.enabled && cfg.key) {
+              answer = await aiLLMAnswer(q, cfg);
+            } else {
+              answer = await aiAnswerRouter(q);
+            }
+          } catch (e) {
+            console.warn('Cloud AI failed, falling back', e);
+            answer = await aiAnswerRouter(q);
+          }
+          aiOutput.textContent = answer;
+        } catch(e) {
+          console.warn('AI router failed', e);
+          aiOutput.textContent = currentLang === 'as' ? 'উত্তৰ দিব পৰা নগল। অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।' : 'Sorry, I could not answer. Please try again.';
+        }
+      };
+      aiVoiceBtn.onclick = function() {
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+          aiOutput.textContent = currentLang === 'as' ? 'এই ব্ৰাউজাৰত ভয়েছ ইনপুট সমৰ্থিত নহয়।' : 'Voice input not supported in this browser.';
+          return;
+        }
+        aiOutput.textContent = currentLang === 'as' ? 'শুনি আছে...' : 'Listening...';
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recog = new SpeechRecognition();
+        recog.lang = currentLang === 'as' ? 'as-IN' : 'en-IN';
+        recog.onresult = function(e) {
+          aiInput.value = e.results[0][0].transcript;
+          aiOutput.textContent = '';
+        };
+        recog.onerror = function(e) {
+          aiOutput.textContent = currentLang === 'as' ? 'কথা চিনিব পৰা নগল।' : 'Could not recognize speech.';
+        };
+        recog.start();
+      };
+      aiSpeakOutBtn.onclick = function() {
+        const text = aiOutput.textContent;
+        if (!text) return;
+        if ('speechSynthesis' in window) {
+          const utter = new SpeechSynthesisUtterance(text);
+          utter.lang = currentLang === 'as' ? 'as-IN' : 'en-IN';
+          window.speechSynthesis.speak(utter);
+        } else {
+          aiOutput.textContent = currentLang === 'as' ? 'কথা সংশ্লেষণ সমৰ্থিত নহয়।' : 'Speech synthesis not supported.';
+        }
+      };
+    }
+
+    // AI bot answers based on the graph above
+    function aiGraphReferenceAnswer(q) {
+      const ql = q.toLowerCase();
+      const row = labData[0];
+      
+      // Assamese responses
+      if (currentLang === 'as') {
+        if(ql.includes('ph') || ql.includes('পিএইচ')) {
+          if(row.ph > 8.5)
+            return `বৰ্তমান pH স্তৰ ${row.ph}, যি উচ্চ (অসুৰক্ষিত)। অনুগ্ৰহ কৰি এই পানী খোৱাৰ পৰা বিৰত থাকক বা ব্যৱহাৰৰ আগতে উতলাওক/ফিল্টাৰ কৰক।`;
+          if(row.ph < 6.5)
+            return `বৰ্তমান pH স্তৰ ${row.ph}, যি কম (অসুৰক্ষিত)। অনুগ্ৰহ কৰি এই পানী খোৱাৰ পৰা বিৰত থাকক বা ব্যৱহাৰৰ আগতে উতলাওক/ফিল্টাৰ কৰক।`;
+          return `বৰ্তমান pH স্তৰ ${row.ph}, যি সুৰক্ষিত পৰিসৰৰ (৬.৫-৮.৫) ভিতৰত।`;
+        }
+        if(ql.includes('turbidity') || ql.includes('ঘোলা')) {
+          if(row.turbidity > 7)
+            return `ঘোলা পানী ${row.turbidity} NTU, যি অসুৰক্ষিত। পানী কণাৰে দূষিত হ'ব পাৰে।`;
+          if(row.turbidity > 5)
+            return `ঘোলা পানী ${row.turbidity} NTU, যি অলপ বেছি (সতৰ্কতা)। পানী ফিল্টাৰ কৰাৰ কথা বিবেচনা কৰক।`;
+          return `ঘোলা পানী ${row.turbidity} NTU, যি সুৰক্ষিত।`;
+        }
+        if(ql.includes('oxygen') || ql.includes('অক্সিজেন')) {
+          if(row.oxygen < 4)
+            return `দ্ৰৱীভূত অক্সিজেন ${row.oxygen} mg/L, যি কম (অসুৰক্ষিত)।`;
+          if(row.oxygen < 5)
+            return `দ্ৰৱীভূত অক্সিজেন ${row.oxygen} mg/L, যি অলপ কম (সতৰ্কতা)।`;
+          return `দ্ৰৱীভূত অক্সিজেন ${row.oxygen} mg/L, যি সুৰক্ষিত।`;
+        }
+        if(ql.includes('nitrate') || ql.includes('নাইট্ৰেট')) {
+          if(row.nitrate > 15)
+            return `নাইট্ৰেট ${row.nitrate} mg/L, যি অসুৰক্ষিত।`;
+          if(row.nitrate > 10)
+            return `নাইট্ৰেট ${row.nitrate} mg/L, যি অলপ বেছি (সতৰ্কতা)।`;
+          return `নাইট্ৰেট ${row.nitrate} mg/L, যি সুৰক্ষিত।`;
+        }
+        if(ql.includes('chlorine') || ql.includes('ক্লৰিন')) {
+          if(row.chlorine > 1)
+            return `ক্লৰিন ${row.chlorine} mg/L, যি অসুৰক্ষিত।`;
+          if(row.chlorine > 0.5)
+            return `ক্লৰিন ${row.chlorine} mg/L, যি অলপ বেছি (সতৰ্কতা)।`;
+          return `ক্লৰিন ${row.chlorine} mg/L, যি সুৰক্ষিত।`;
+        }
+        if(ql.includes('খাব') || ql.includes('নিৰাপদ') || ql.includes('পানী সুৰক্ষিত')) {
+          let unsafe = [];
+          if(row.ph < 6.5 || row.ph > 8.5) unsafe.push('pH');
+          if(row.turbidity > 7) unsafe.push('ঘোলা পানী');
+          if(row.oxygen < 4) unsafe.push('দ্ৰৱীভূত অক্সিজেন');
+          if(row.nitrate > 15) unsafe.push('নাইট্ৰেট');
+          if(row.chlorine > 1) unsafe.push('ক্লৰিন');
+          if(unsafe.length)
+            return `নহয়, পানী বৰ্তমানে খোৱাৰ বাবে অসুৰক্ষিত কাৰণ: ${unsafe.join(', ')}। অনুগ্ৰহ কৰি ব্যৱহাৰৰ আগতে পানী উতলাওক বা ফিল্টাৰ কৰক।`;
+          return "হয়, শেহতীয়া পৰীক্ষাগাৰৰ প্ৰতিবেদন অনুসৰি পানী বৰ্তমানে খোৱাৰ বাবে সুৰক্ষিত।";
+        }
+        if(ql.includes('সাৰাংশ') || ql.includes('সামগ্ৰিক') || ql.includes('প্ৰতিবেদন')) {
+          let msg = `বৰ্তমান পানীৰ মান: `;
+          msg += `pH: ${row.ph}, ঘোলা পানী: ${row.turbidity} NTU, অক্সিজেন: ${row.oxygen} mg/L, নাইট্ৰেট: ${row.nitrate} mg/L, ক্লৰিন: ${row.chlorine} mg/L। `;
+          let unsafe = [];
+          if(row.ph < 6.5 || row.ph > 8.5) unsafe.push('pH');
+          if(row.turbidity > 7) unsafe.push('ঘোলা পানী');
+          if(row.oxygen < 4) unsafe.push('দ্ৰৱীভূত অক্সিজেন');
+          if(row.nitrate > 15) unsafe.push('নাইট্ৰেট');
+          if(row.chlorine > 1) unsafe.push('ক্লৰিন');
+          if(unsafe.length)
+            msg += `অসুৰক্ষিত মাপকাঠী: ${unsafe.join(', ')}.`;
+          else
+            msg += "সকলো মাপকাঠী সুৰক্ষিত সীমাৰ ভিতৰত আছে।";
+          return msg;
+        }
+        return "মই ওপৰৰ গ্ৰাফত দেখুওৱা বৰ্তমানৰ পানীৰ মানৰ মাপকাঠী (pH, ঘোলা পানী, অক্সিজেন, নাইট্ৰেট, ক্লৰিন)ৰ বিষয়ে প্ৰশ্নৰ উত্তৰ দিব পাৰো। অনুগ্ৰহ কৰি কোনো নিৰ্দিষ্ট মাপকাঠীৰ বিষয়ে বা পানী খোৱাৰ বাবে সুৰক্ষিত নে নহয় সেই বিষয়ে সোধক।";
+      }
+
+      // English responses (original)
+      if(ql.includes('ph')) {
+        if(row.ph > 8.5)
+          return `The current pH level is ${row.ph}, which is high (unsafe). Please avoid drinking this water or boil/filter it before use.`;
+        if(row.ph < 6.5)
+          return `The current pH level is ${row.ph}, which is low (unsafe). Please avoid drinking this water or boil/filter it before use.`;
+        return `The current pH level is ${row.ph}, which is within the safe range (6.5-8.5).`;
+      }
+      if(ql.includes('turbidity')) {
+        if(row.turbidity > 7)
+          return `Turbidity is ${row.turbidity} NTU, which is unsafe. Water may be contaminated with particles.`;
+        if(row.turbidity > 5)
+          return `Turbidity is ${row.turbidity} NTU, which is slightly high (warning). Consider filtering the water.`;
+        return `Turbidity is ${row.turbidity} NTU, which is safe.`;
+      }
+      if(ql.includes('oxygen')) {
+        if(row.oxygen < 4)
+          return `Dissolved oxygen is ${row.oxygen} mg/L, which is low (unsafe).`;
+        if(row.oxygen < 5)
+          return `Dissolved oxygen is ${row.oxygen} mg/L, which is slightly low (warning).`;
+        return `Dissolved oxygen is ${row.oxygen} mg/L, which is safe.`;
+      }
+      if(ql.includes('nitrate')) {
+        if(row.nitrate > 15)
+          return `Nitrate is ${row.nitrate} mg/L, which is unsafe.`;
+        if(row.nitrate > 10)
+          return `Nitrate is ${row.nitrate} mg/L, which is slightly high (warning).`;
+        return `Nitrate is ${row.nitrate} mg/L, which is safe.`;
+      }
+      if(ql.includes('chlorine')) {
+        if(row.chlorine > 1)
+          return `Chlorine is ${row.chlorine} mg/L, which is unsafe.`;
+        if(row.chlorine > 0.5)
+          return `Chlorine is ${row.chlorine} mg/L, which is slightly high (warning).`;
+        return `Chlorine is ${row.chlorine} mg/L, which is safe.`;
+      }
+      if(ql.includes('safe to drink') || ql.includes('drink') || ql.includes('water safe')) {
+        let unsafe = [];
+        if(row.ph < 6.5 || row.ph > 8.5) unsafe.push('pH');
+        if(row.turbidity > 7) unsafe.push('turbidity');
+        if(row.oxygen < 4) unsafe.push('dissolved oxygen');
+        if(row.nitrate > 15) unsafe.push('nitrate');
+        if(row.chlorine > 1) unsafe.push('chlorine');
+        if(unsafe.length)
+          return `No, the water is currently unsafe to drink due to: ${unsafe.join(', ')}. Please boil or filter the water before use.`;
+        return "Yes, the water is currently safe to drink according to the latest lab report.";
+      }
+      if(ql.includes('summary') || ql.includes('overall') || ql.includes('report')) {
+        let msg = `Current water quality: `;
+        msg += `pH: ${row.ph}, Turbidity: ${row.turbidity} NTU, Oxygen: ${row.oxygen} mg/L, Nitrate: ${row.nitrate} mg/L, Chlorine: ${row.chlorine} mg/L. `;
+        let unsafe = [];
+        if(row.ph < 6.5 || row.ph > 8.5) unsafe.push('pH');
+        if(row.turbidity > 7) unsafe.push('turbidity');
+        if(row.oxygen < 4) unsafe.push('dissolved oxygen');
+        if(row.nitrate > 15) unsafe.push('nitrate');
+        if(row.chlorine > 1) unsafe.push('chlorine');
+        if(unsafe.length)
+          msg += `Unsafe parameters: ${unsafe.join(', ')}.`;
+        else
+          msg += "All parameters are within safe limits.";
+        return msg;
+      }
+      return "I can answer questions about the current water quality parameters (pH, turbidity, oxygen, nitrate, chlorine) as shown in the graph above. Please ask about a specific parameter or if the water is safe to drink.";
+    }
+
+    // Cloud AI helpers (optional, requires user-provided API key)
+    async function aiLLMAnswer(query, cfg){
+      const sys = `You are a helpful, concise assistant for Rural Hydras. Answer any question accurately. If user asks about water/health, prioritize practical, local guidance. Keep answers short and clear. Current UI language: ${currentLang}.`;
+      const user = query;
+      const provider = (cfg && cfg.provider) || 'openai';
+      const key = cfg && cfg.key;
+      if (!key) throw new Error('Missing API key');
+      if (provider === 'openai') {
+        const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model: 'gpt-4o-mini', temperature: 0.3, max_tokens: 512, messages: [ { role:'system', content: sys }, { role:'user', content: user } ] })
+        });
+        if(!resp.ok) throw new Error('OpenAI error ' + resp.status);
+        const data = await resp.json();
+        return (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
+      } else if (provider === 'openrouter') {
+        const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model: 'openrouter/auto', temperature: 0.3, max_tokens: 512, messages: [ { role:'system', content: sys }, { role:'user', content: user } ] })
+        });
+        if(!resp.ok) throw new Error('OpenRouter error ' + resp.status);
+        const data = await resp.json();
+        return (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
+      } else if (provider === 'gemini') {
+        const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=' + encodeURIComponent(key);
+        const payload = { contents: [ { role: 'user', parts: [ { text: sys + '\n\n' + user } ] } ], generationConfig: { temperature: 0.3, maxOutputTokens: 512 } };
+        const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        if(!resp.ok) throw new Error('Gemini error ' + resp.status);
+        const data = await resp.json();
+        const txt = data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
+        return txt || '';
+      }
+      throw new Error('Unknown provider');
+    }
+
+    // General AI answer router and helpers
+    function isWaterQuestion(ql){
+      const keys = [
+        'ph','turbidity','oxygen','nitrate','chlorine','water safe','safe to drink','drink',
+        'পিএইচ','ঘোলা','অক্সিজেন','নাইট্ৰেট','ক্লৰিন','পানী','নিৰাপদ','খাব'
+      ];
+      return keys.some(k=>ql.includes(k));
+    }
+
+    function safeArithmeticAnswer(q){
+      const cleaned = q
+        .replace(/equals|is|what is|what's|calculate|sum|add|minus|subtract|times|multiply|divided by|divide/gi,'')
+        .replace(/[x×]/gi,'*')
+        .replace(/[÷]/g,'/')
+        .trim();
+      if(!/^[0-9+\-*/().%\s]+$/.test(cleaned)) return null;
+      try{
+        const val = Function('return ('+cleaned+')')();
+        if (typeof val === 'number' && isFinite(val)) {
+          return (currentLang==='as' ? 'উত্তৰ: ' : 'Result: ') + String(val);
+        }
+      }catch(_){ }
+      return null;
+    }
+
+    async function wikiAnswer(query){
+      const subFromLang = (l)=> (l==='as' ? 'as' : 'en');
+      async function fetchFrom(sub){
+        const searchURL = `https://${sub}.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=1&namespace=0&format=json&origin=*`;
+        const sResp = await fetch(searchURL);
+        const sData = await sResp.json();
+        const title = (sData && sData[1] && sData[1][0]) ? sData[1][0] : null;
+        if(!title) return null;
+        const sumURL = `https://${sub}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`;
+        const sumResp = await fetch(sumURL, { headers: { 'Accept-Language': currentLang==='as'?'as-IN':'en-US' } });
+        if(!sumResp.ok) return null;
+        const sum = await sumResp.json();
+        const text = sum && (sum.extract || sum.description) ? (sum.extract || sum.description) : '';
+        const url = sum && sum.content_urls && sum.content_urls.desktop && sum.content_urls.desktop.page ? sum.content_urls.desktop.page : '';
+        if(!text) return null;
+        const trimmed = text.length > 700 ? text.slice(0,700).trim() + '…' : text;
+        const titleOut = sum.title || title;
+        const prefix = currentLang==='as' ? `${titleOut}: ` : `${titleOut}: `;
+        return `${prefix}${trimmed}${url ? '\nRead more: ' + url : ''}`;
+      }
+      const sub = subFromLang(currentLang);
+      let res = null;
+      try{ res = await fetchFrom(sub); }catch(_){ res = null; }
+      if(!res && sub!=='en') { try{ res = await fetchFrom('en'); }catch(_){ res = null; } }
+      return res;
+    }
+
+    async function aiAnswerRouter(q){
+      const ql = q.toLowerCase();
+
+      if (isWaterQuestion(ql)) {
+        return aiGraphReferenceAnswer(q);
+      }
+
+      const math = safeArithmeticAnswer(q);
+      if (math) return math;
+
+      if (/(time|date|day|today|now)\b/i.test(q)) {
+        const txt = new Date().toLocaleString(currentLang==='as' ? 'as-IN' : 'en-IN');
+        return currentLang==='as' ? `স্থানীয় সময়/ তাৰিখ: ${txt}` : `Local date/time: ${txt}`;
+      }
+
+      const wiki = await wikiAnswer(q);
+      if (wiki) return wiki;
+
+      return currentLang==='as'
+        ? 'এই প্ৰশ্নটোৰ বাবে নিৰ্দিষ্ট উৎস নাপালোঁ। অনুগ্ৰহ কৰি প্ৰশ্নটো সলনি কৰি পুনৰ চেষ্টা কৰক।'
+        : 'I could not find a reliable source for this question. Please try rephrasing or be more specific.';
+    }
+
+    // Geolocation helpers
+    function computeBBox(lat, lon, spanKm = 6) {
+      const dLat = spanKm / 111; // ~111 km per degree latitude
+      const cosLat = Math.cos((lat || 0) * Math.PI / 180) || 1;
+      const dLon = spanKm / (111 * cosLat);
+      const minLon = (lon - dLon).toFixed(6);
+      const minLat = (lat - dLat).toFixed(6);
+      const maxLon = (lon + dLon).toFixed(6);
+      const maxLat = (lat + dLat).toFixed(6);
+      return `${minLon},${minLat},${maxLon},${maxLat}`;
+    }
+
+    function updateMapIframeTo(lat, lon, spanKm = 6) {
+      try {
+        const map = document.getElementById('map');
+        if (!map) return;
+        const bbox = computeBBox(lat, lon, spanKm);
+        map.src = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lon}`;
+      } catch(e) { console.warn('updateMapIframeTo failed', e); }
+    }
+
+    function locationSearchSectionHTML() {
+      return `
+        <section class="search-section">
+          <h3>${translations[currentLang].searchLocation}</h3>
+          <div class="search-row">
+            <input id="placeQuery" placeholder="${translations[currentLang].queryPlaceholder}" />
+            <select id="searchMode">
+              <option value="user">${translations[currentLang].userMode}</option>
+              <option value="govt">${translations[currentLang].govtMode}</option>
+            </select>
+            <button id="searchBtn">${translations[currentLang].search}</button>
+          </div>
+          <div id="searchStatus" style="font-size:12px;color:var(--muted);margin-top:6px;">${translations[currentLang].selectAResult}</div>
+          <ul id="searchResults"></ul>
+          <div id="placeReports"></div>
+        </section>
+      `;
+    }
+
+    // Report overlay helpers
+    let __RH_reportRec = null;
+    function getUserReports(){
+      try { const r = JSON.parse(localStorage.getItem('RH_USER_REPORTS')||'[]'); return Array.isArray(r)? r: []; } catch(_){ return []; }
+    }
+    function setUserReports(list){
+      try { localStorage.setItem('RH_USER_REPORTS', JSON.stringify(list||[])); } catch(_){ }
+    }
+    function showReportOverlay(){
+      try{
+        const report = document.getElementById('report');
+        const textEl = document.getElementById('reportText');
+        const photoEl = document.getElementById('reportPhoto');
+        const voiceBtn = document.getElementById('reportVoiceBtn');
+        const voiceStatus = document.getElementById('reportVoiceStatus');
+        // reset
+        const radios = document.querySelectorAll('input[name="reportType"]');
+        radios.forEach(r=>{ r.checked = false; });
+        if (textEl) textEl.value = '';
+        if (photoEl) photoEl.value = '';
+        if (voiceStatus) voiceStatus.textContent = '';
+        if (voiceBtn) voiceBtn.textContent = translations[currentLang].recordVoice;
+        if (report) { report.classList.add('show'); report.setAttribute('aria-hidden','false'); }
+        setupReportOverlay();
+      }catch(e){ console.error(e); }
+    }
+    function setupReportOverlay(){
+      if (window.__RH_reportWired) return; window.__RH_reportWired = true;
+      const report = document.getElementById('report');
+      const textEl = document.getElementById('reportText');
+      const photoEl = document.getElementById('reportPhoto');
+      const voiceBtn = document.getElementById('reportVoiceBtn');
+      const voiceStatus = document.getElementById('reportVoiceStatus');
+      const cancelBtn = document.getElementById('reportCancelBtn');
+      const submitBtn = document.getElementById('reportSubmitBtn');
+      function stopRec(){
+        try{ if (__RH_reportRec) { __RH_reportRec.stop(); __RH_reportRec = null; } }catch(_){ }
+        if (voiceBtn) voiceBtn.textContent = translations[currentLang].recordVoice;
+        if (voiceStatus) voiceStatus.textContent = '';
+      }
+      if (voiceBtn) voiceBtn.onclick = function(){
+        try{
+          if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            alert(currentLang==='as' ? 'এই ব্ৰাউজাৰত ভয়েছ ইনপুট সমৰ্থিত নহয়।' : 'Voice input not supported in this browser.');
+            return;
+          }
+          if (__RH_reportRec) { stopRec(); return; }
+          const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+          __RH_reportRec = new SpeechRecognition();
+          __RH_reportRec.lang = currentLang === 'as' ? 'as-IN' : 'en-IN';
+          __RH_reportRec.onstart = function(){ if (voiceStatus) voiceStatus.textContent = currentLang==='as' ? 'শুনি আছে...' : 'Listening...'; if (voiceBtn) voiceBtn.textContent = translations[currentLang].stop; };
+          __RH_reportRec.onresult = function(e){ try{ const t = e.results[0][0].transcript || ''; if (textEl) textEl.value = ((textEl.value||'') + (textEl.value?' ':'') + t).trim(); }catch(_){ } };
+          __RH_reportRec.onerror = function(){ stopRec(); };
+          __RH_reportRec.onend = function(){ stopRec(); };
+          __RH_reportRec.start();
+        }catch(e){ console.error(e); stopRec(); }
+      };
+      if (cancelBtn) cancelBtn.onclick = function(){
+        try{ stopRec(); if (report) { report.classList.remove('show'); report.classList.add('hidden'); } }catch(_){ }
+      };
+      if (submitBtn) submitBtn.onclick = function(){
+        try{
+          const typeEl = document.querySelector('input[name="reportType"]:checked');
+          const type = typeEl ? typeEl.value : '';
+          const text = (textEl && textEl.value ? textEl.value.trim() : '');
+          if (!type) { alert(translations[currentLang].pleaseSelectType); return; }
+          const hasPhoto = photoEl && photoEl.files && photoEl.files[0];
+          if (!text && !hasPhoto) { alert(translations[currentLang].pleaseAddTextOrPhoto); return; }
+          function finish(photoData){
+            const reports = getUserReports();
+            reports.unshift({ type, text, photo: photoData||'', ts: Date.now() });
+            setUserReports(reports);
+            alert(translations[currentLang].reportSent);
+            if (report) { report.classList.remove('show'); report.classList.add('hidden'); }
+            stopRec();
+          }
+          if (hasPhoto) {
+            const reader = new FileReader();
+            reader.onload = function(){ finish(reader.result); };
+            reader.onerror = function(){ finish(null); };
+            reader.readAsDataURL(photoEl.files[0]);
+          } else {
+            finish(null);
+          }
+        }catch(e){ console.error(e); }
+      };
+    }
+
+    function computeReportsFromLatLon(lat, lon) {
+      const frac = (Math.abs(lat*0.73) + Math.abs(lon*0.51)) % 1;
+      const riskScore = frac;
+      const ph = Math.max(6, Math.min(9.8, 7 + (frac - 0.5) * 3.4));
+      const turbidity = Math.max(0.2, Math.min(9.8, 2.5 + frac * 6.5));
+      const oxygen = Math.max(2, Math.min(9.5, 6.5 - frac * 3.8));
+      const nitrate = Math.max(1, Math.min(20, 3 + frac * 16));
+      const chlorine = Math.max(0.05, Math.min(1.6, 0.15 + frac * 1.35));
+      let status = 'success';
+      const params = { ph:+ph.toFixed(1), turbidity:+turbidity.toFixed(1), oxygen:+oxygen.toFixed(1), nitrate:+nitrate.toFixed(0), chlorine:+chlorine.toFixed(1) };
+      const issues = [];
+      if (params.ph < 6.5 || params.ph > 8.5) issues.push('ph');
+      if (params.turbidity > 7) issues.push('turbidity');
+      if (params.oxygen < 4) issues.push('oxygen');
+      if (params.nitrate > 15) issues.push('nitrate');
+      if (params.chlorine > 1) issues.push('chlorine');
+      if (issues.length >= 2) status = 'danger'; else if (issues.length === 1) status = 'warn'; else status = 'success';
+      const householdsAffected = Math.floor(40 + frac * 500);
+      const sourcesTested = Math.floor(5 + frac * 30);
+      return { params, issues, status, householdsAffected, sourcesTested, riskScore, lastUpdated: new Date().toLocaleString() };
+    }
+
+    function renderUserReport(rep, name) {
+      const p = rep.params;
+      function badge(stat){ return stat==='success' ? '#16a34a' : (stat==='warn' ? '#eab308' : '#e11d48'); }
+      return `
+        <div class="report-card">
+          <div style="font-weight:600;margin-bottom:6px;">${translations[currentLang].reportsFor} ${name || ''}</div>
+          <ul style="list-style:none;margin:0;padding:0;">
+            <li style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed #e3efe7;">pH <span class="report-badge" style="background:${badge(getStatus('ph', p.ph))}">${p.ph}</span></li>
+            <li style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed #e3efe7;">Turbidity <span class="report-badge" style="background:${badge(getStatus('turbidity', p.turbidity))}">${p.turbidity} NTU</span></li>
+            <li style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed #e3efe7;">Oxygen <span class="report-badge" style="background:${badge(getStatus('oxygen', p.oxygen))}">${p.oxygen} mg/L</span></li>
+            <li style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed #e3efe7;">Nitrate <span class="report-badge" style="background:${badge(getStatus('nitrate', p.nitrate))}">${p.nitrate} mg/L</span></li>
+            <li style="display:flex;justify-content:space-between;padding:4px 0;">Chlorine <span class="report-badge" style="background:${badge(getStatus('chlorine', p.chlorine))}">${p.chlorine} mg/L</span></li>
+          </ul>
+          <div style="font-size:12px;color:var(--muted);margin-top:6px;">${translations[currentLang].lastUpdated}: ${rep.lastUpdated}</div>
+          <button class="apply-report-btn" style="width:auto;margin-top:10px;">${translations[currentLang].showInLab}</button>
+        </div>
+      `;
+    }
+
+    function renderGovtReport(rep, name) {
+      const color = rep.status==='success' ? 'var(--accent)' : (rep.status==='warn' ? 'var(--warn)' : 'var(--danger)');
+      const label = rep.status==='success' ? translations[currentLang].safe : (rep.status==='warn' ? translations[currentLang].warning : translations[currentLang].unsafe);
+      return `
+        <div class="report-card">
+          <div style="font-weight:600;margin-bottom:6px;">${translations[currentLang].reportsFor} ${name || ''}</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <div style="flex:1 1 120px;background:#f8fdfb;border:1px solid #e3efe7;border-radius:8px;padding:8px;text-align:center;">
+              <div style="font-size:12px;color:var(--muted);">${translations[currentLang].householdsAffected}</div>
+              <div style="font-size:20px;font-weight:700;">${rep.householdsAffected}</div>
+            </div>
+            <div style="flex:1 1 120px;background:#f8fdfb;border:1px solid #e3efe7;border-radius:8px;padding:8px;text-align:center;">
+              <div style="font-size:12px;color:var(--muted);">${translations[currentLang].sourcesTested}</div>
+              <div style="font-size:20px;font-weight:700;">${rep.sourcesTested}</div>
+            </div>
+            <div style="flex:1 1 120px;background:#f8fdfb;border:1px solid #e3efe7;border-radius:8px;padding:8px;text-align:center;">
+              <div style="font-size:12px;color:var(--muted);">Risk</div>
+              <div style="font-size:16px;font-weight:700;color:${color}">${label}</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:6px;">${translations[currentLang].lastUpdated}: ${rep.lastUpdated}</div>
+          <button class="apply-report-btn" style="width:auto;margin-top:10px;">${translations[currentLang].showInLab}</button>
+        </div>
+      `;
+    }
+
+    function setupLocationSearch() {
+      const qEl = document.getElementById('placeQuery');
+      const btn = document.getElementById('searchBtn');
+      const resList = document.getElementById('searchResults');
+      const statusEl = document.getElementById('searchStatus');
+      const modeEl = document.getElementById('searchMode');
+      const reportsEl = document.getElementById('placeReports');
+      if (!qEl || !btn || !resList || !statusEl || !modeEl || !reportsEl) return;
+
+      async function doSearch() {
+        const q = (qEl.value || '').trim();
+        if (!q) { statusEl.textContent = translations[currentLang].selectAResult; return; }
+        statusEl.textContent = translations[currentLang].searching;
+        resList.innerHTML = '';
+        reportsEl.innerHTML = '';
+        try {
+          const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=5`;
+          const resp = await fetch(url, { headers: { 'Accept-Language': currentLang==='as'?'as-IN':'en-IN' } });
+          const data = await resp.json();
+          if (!Array.isArray(data) || data.length === 0) {
+            statusEl.textContent = translations[currentLang].noResults;
+            return;
+          }
+          statusEl.textContent = `${data.length} results`;
+          resList.innerHTML = data.map((d,i)=>`<li data-lat="${d.lat}" data-lon="${d.lon}" data-name="${(d.display_name||'').replace(/"/g,'&quot;')}">📍 ${d.display_name}</li>`).join('');
+          [...resList.querySelectorAll('li')].forEach(li=>{
+            li.addEventListener('click', ()=>{
+              const lat = parseFloat(li.getAttribute('data-lat'));
+              const lon = parseFloat(li.getAttribute('data-lon'));
+              const name = li.getAttribute('data-name');
+              window.__RH_searchTarget = { lat, lon };
+              window.__RH_searchName = name;
+              updateMapIframeTo(lat, lon, 6);
+              const rep = computeReportsFromLatLon(lat, lon);
+              reportsEl.innerHTML = (modeEl.value === 'govt') ? renderGovtReport(rep, name) : renderUserReport(rep, name);
+              statusEl.textContent = `${translations[currentLang].reportsFor} ${name}`;
+              const applyBtn = reportsEl.querySelector('.apply-report-btn');
+              if (applyBtn) {
+                applyBtn.onclick = function(){
+                  applyLabToGraph(name, rep.params, true);
+                  const labSec = document.getElementById('labSection');
+                  if (labSec) labSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                };
+              }
+            });
+          });
+        } catch(e) {
+          console.warn('Search failed', e);
+          statusEl.textContent = translations[currentLang].noResults;
+        }
+      }
+
+      btn.onclick = doSearch;
+      qEl.addEventListener('keypress', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); doSearch(); }});
+      modeEl.addEventListener('change', ()=>{
+        // Re-render reports if a target is already selected
+        if (window.__RH_searchTarget && reportsEl.innerHTML) {
+          const rep = computeReportsFromLatLon(window.__RH_searchTarget.lat, window.__RH_searchTarget.lon);
+          const name = window.__RH_searchName;
+          reportsEl.innerHTML = (modeEl.value === 'govt') ? renderGovtReport(rep, name) : renderUserReport(rep, name);
+          const applyBtn2 = reportsEl.querySelector('.apply-report-btn');
+          if (applyBtn2) {
+            applyBtn2.onclick = function(){
+              applyLabToGraph(name, rep.params, true);
+              const labSec = document.getElementById('labSection');
+              if (labSec) labSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
+          }
+        }
+      });
+    }
+
+    function updateFromLocation(lat, lon) {
+      try {
+        window.__RH_location = { lat, lon };
+        window.__RH_mapBBox = computeBBox(lat, lon, 6);
+        // Derive nearby lab report values deterministically from lat/lon
+        const frac = (Math.abs(lat) + Math.abs(lon)) % 1;
+        const ph = Math.max(6, Math.min(9.5, 7 + (frac - 0.5) * 3));
+        const turbidity = Math.max(0.5, Math.min(9.5, 3 + frac * 5));
+        const oxygen = Math.max(2, Math.min(9, 6 - frac * 3));
+        const nitrate = Math.max(1, Math.min(18, 4 + frac * 14));
+        const chlorine = Math.max(0.1, Math.min(1.5, 0.2 + frac * 1.2));
+        if (Array.isArray(labData) && labData[0]) {
+          labData[0] = {
+            location: "Nearby",
+            date: "Today",
+            ph: +ph.toFixed(1),
+            turbidity: +turbidity.toFixed(1),
+            oxygen: +oxygen.toFixed(1),
+            nitrate: +nitrate.toFixed(0),
+            chlorine: +chlorine.toFixed(1)
+          };
+        }
+      } catch(e) { console.warn('updateFromLocation failed', e); }
+    }
+
+    function requestLocationAndStore(cb) {
+      if (!navigator.geolocation) return;
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          updateFromLocation(latitude, longitude);
+          try { localStorage.setItem('RH_LAST_LOC', JSON.stringify(window.__RH_location)); } catch(_){}
+          try { if (typeof cb === 'function') cb(); } catch(_){}
+        },
+        (err) => {
+          console.warn('Geolocation error', err);
+        },
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+      );
+    }
+
+    document.addEventListener('DOMContentLoaded', ()=> {
+      try {
+        const savedUser = getSessionUser();
+        const wantResume = (localStorage.getItem('RH_RESUME_DASH') === 'true');
+        if (savedUser && savedUser.role && wantResume) {
+          clearResumeFlag();
+          splash.classList.add('hidden');
+          role.classList.add('hidden');
+          role.classList.remove('show');
+          window.__RH_user = savedUser;
+          dashboard.classList.add('show');
+          dashboard.setAttribute('aria-hidden','false');
+          const roleText = savedUser.role === 'user' ? translations[currentLang].userClinic : translations[currentLang].ashaWorkerGov;
+          welcome.textContent = `${savedUser.name || 'User'} — ${roleText}`;
+          avatar.textContent = ((savedUser.name||'U')[0]||'U').toUpperCase();
+          if (savedUser.role === 'user' && window.__RH_location) {
+            updateFromLocation(window.__RH_location.lat, window.__RH_location.lon);
+          }
+          loadDashboard(savedUser.role);
+          return;
+        }
+      } catch(e) { console.warn('Resume check failed', e); }
+      setTimeout(()=> {
+        try{
+          splash.classList.add('hidden');
+          role.classList.add('show');
+          role.setAttribute('aria-hidden','false');
+        }catch(e){ console.error(e); }
+      }, 900);
+    });
+
+    langSelect.addEventListener('change', (e)=>{
+      const selectedLang = e.target.value;
+      updateLanguage(selectedLang);
+      if(window.__RH_user?.role) {
+        loadDashboard(window.__RH_user.role);
+      }
+    });
+
+    btnVerify.addEventListener('click', ()=>{
+      try{
+        const name = document.getElementById('name').value.trim();
+        const id = document.getElementById('userId').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        if(!name || !id || !phone){
+          const alertMsg = currentLang === 'as' ? 'অনুগ্ৰহ কৰি নাম, পৰিচয় আৰু ফোন পূৰণ কৰক।' : 'Please fill name, id and phone.';
+          alert(alertMsg);
+          return;
+        }
+        const roleSelected = (window.__RH_user && window.__RH_user.role) ? window.__RH_user.role : 'user';
+        window.__RH_user = {name,id,phone,role: roleSelected};
+        setSessionUser(window.__RH_user);
+        verify.classList.remove('show');
+        verify.classList.add('hidden');
+        dashboard.classList.add('show');
+        dashboard.setAttribute('aria-hidden','false');
+        const roleText = roleSelected === 'user' ? translations[currentLang].userClinic : translations[currentLang].ashaWorkerGov;
+        welcome.textContent = `${window.__RH_user.name} — ${roleText}`;
+        avatar.textContent = (window.__RH_user.name||'U')[0].toUpperCase();
+        if (roleSelected === 'user' && window.__RH_location) {
+          updateFromLocation(window.__RH_location.lat, window.__RH_location.lon);
+        }
+        loadDashboard(roleSelected);
+      }catch(e){ console.error(e); }
+    });
+
+    btnRole.addEventListener('click', ()=>{
+      try{
+        const chosen = roleSelect.value;
+        if(!chosen){ 
+          const alertMsg = currentLang === 'as' ? 'এটা ভূমিকা নিৰ্বাচন কৰক' : 'Select a role';
+          alert(alertMsg); 
+          return; 
+        }
+        if (!window.__RH_user) window.__RH_user = {};
+        window.__RH_user.role = chosen;
+        if (chosen === 'user') {
+          requestLocationAndStore();
+          role.classList.remove('show'); role.classList.add('hidden');
+          verify.classList.add('show'); verify.setAttribute('aria-hidden','false');
+        } else if (chosen === 'combined') {
+          role.classList.remove('show'); role.classList.add('hidden');
+          govtVerify.classList.add('show'); govtVerify.setAttribute('aria-hidden','false');
+        }
+      }catch(e){ console.error(e); }
+    });
+
+    // Govt + ASHA verification flow
+    if (btnGovtVerify) {
+      btnGovtVerify.addEventListener('click', ()=>{
+        try{
+          const name = (document.getElementById('govtFullName')||{}).value?.trim() || '';
+          const email = (document.getElementById('govtEmail')||{}).value?.trim() || '';
+          const phone = (document.getElementById('govtPhone')||{}).value?.trim() || '';
+          if(!name || !email || !phone){
+            alert(translations[currentLang].pleaseFillDetails);
+            return;
+          }
+          window.__RH_user = { name, email, phone, role: 'combined' };
+          setSessionUser(window.__RH_user);
+          if (govtVerify) { govtVerify.classList.remove('show'); govtVerify.classList.add('hidden'); }
+          if (dept) { dept.classList.add('show'); dept.setAttribute('aria-hidden','false'); }
+        }catch(e){ console.error(e); }
+      });
+    }
+
+    function updateOrgUI(org){
+      if (!orgFields || !orgIdInput) return;
+      orgFields.style.display = 'block';
+      let ph = translations[currentLang].enterAshaId;
+      if (org === 'phed') ph = translations[currentLang].enterPhedId;
+      else if (org === 'jalshakti') ph = translations[currentLang].enterJalShaktiId;
+      orgIdInput.placeholder = ph;
+    }
+    const orgRadios = document.querySelectorAll('input[name="orgOption"]');
+    if (orgRadios && orgRadios.length) {
+      orgRadios.forEach(r=>{
+        r.addEventListener('change', (e)=>{
+          window.__RH_orgChoice = e.target.value;
+          updateOrgUI(window.__RH_orgChoice);
+        });
+      });
+    }
+    if (btnOrgContinue) {
+      btnOrgContinue.addEventListener('click', ()=>{
+        try{
+          const org = window.__RH_orgChoice;
+          const id = orgIdInput ? (orgIdInput.value||'').trim() : '';
+          const file = orgIdPhoto ? orgIdPhoto.files[0] : null;
+          if(!org){ alert(translations[currentLang].selectDeptOption); return; }
+          if(!file || !id){ alert(translations[currentLang].needPhotoAndId); return; }
+          const proceed = (photoData)=>{
+            try{
+              window.__RH_user = window.__RH_user || {};
+              window.__RH_user.organization = org;
+              window.__RH_user.orgId = id;
+              if (photoData) window.__RH_user.orgPhoto = photoData;
+              window.__RH_user.role = 'combined';
+              setSessionUser(window.__RH_user);
+              setResumeFlag();
+              if (dept) { dept.classList.remove('show'); dept.classList.add('hidden'); }
+              dashboard.classList.add('show'); dashboard.setAttribute('aria-hidden','false');
+              const roleText = translations[currentLang].ashaWorkerGov;
+              welcome.textContent = `${window.__RH_user.name} — ${roleText}`;
+              avatar.textContent = (window.__RH_user.name||'U')[0].toUpperCase();
+              loadDashboard('combined');
+            }catch(e){ console.error(e); }
+          };
+          const reader = new FileReader();
+          reader.onload = function(){ proceed(reader.result); };
+          reader.onerror = function(){ proceed(null); };
+          reader.readAsDataURL(file);
+        }catch(e){ console.error(e); }
+      });
+    }
+
+    backBtn.addEventListener('click', ()=>{
+      try{
+        dashboard.classList.remove('show'); dashboard.classList.add('hidden');
+        dashContent.innerHTML = '';
+        role.classList.remove('hidden'); role.classList.add('show');
+      }catch(e){ console.error(e); }
+    });
+
+  }catch(e){
+    try{ document.getElementById('debug').textContent = 'Init error: '+e; document.getElementById('debug').classList.add('visible'); }catch(_){}
+    console.error('Fatal init error', e);
+  }
+})();
+</script>
+</body>
+</html>

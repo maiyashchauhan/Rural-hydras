@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Report an Issue — Rural Hydras</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:400,600,700&display=swap">
+<style>
+  :root{
+    --bg: #f4faf7;
+    --card: #f8fdfb;
+    --muted: #6b7c74;
+    --accent: #16a34a;
+    --accent2: #06b6d4;
+    --danger: #e11d48;
+    --dark: #183b2a;
+    --shadow: 0 8px 32px 0 #0001;
+    --radius: 18px;
+  }
+  *{box-sizing:border-box}
+  body{ margin:0; font-family:Inter,Arial,Helvetica,sans-serif; background:var(--bg); color:var(--dark); min-height:100vh; display:flex; flex-direction:column; }
+  header{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:#fff8; backdrop-filter: blur(4px); border-bottom:1px solid #e3efe7; box-shadow:0 2px 12px #0001; }
+  header .title{ font-weight:700; }
+  header .btn{ background:#e3efe7; color:var(--dark); border:none; border-radius:8px; padding:8px 12px; cursor:pointer; }
+  main{ flex:1; display:flex; align-items:center; justify-content:center; padding:16px; }
+  .card{ background:var(--card); width:95%; max-width:520px; border-radius:var(--radius); box-shadow:var(--shadow); border:1px solid #e3efe7; padding:22px 18px; }
+  h2{ margin:0 0 10px 0; }
+  .row{ margin-top:10px; }
+  .type-row{ display:flex; gap:14px; flex-wrap:wrap; }
+  label{ font-size:14px; }
+  textarea, input[type="file"], button{ width:100%; margin-top:10px; font-family:inherit; }
+  textarea{ min-height:120px; resize:vertical; padding:10px; border-radius:10px; border:1px solid #cfe8dd; background:#fff; font-size:15px; }
+  .controls{ display:flex; gap:10px; align-items:center; }
+  .btn-primary{ background:var(--accent); color:#fff; border:none; border-radius:10px; padding:12px; font-size:16px; cursor:pointer; }
+  .btn-secondary{ background:#e3efe7; color:var(--dark); border:none; border-radius:10px; padding:12px; font-size:16px; cursor:pointer; }
+  .status{ font-size:12px; color:var(--muted); }
+  footer{ text-align:center; color:var(--muted); font-size:12px; padding:8px 0 14px 0; }
+</style>
+</head>
+<body>
+  <header>
+    <button id="backBtn" class="btn">← Back</button>
+    <div class="title">Rural Hydras</div>
+    <div style="width:86px"></div>
+  </header>
+  <main>
+    <div class="card">
+      <h2>Report an Issue</h2>
+      <div class="row">
+        <div style="font-size:14px;">Report type</div>
+        <div class="type-row">
+          <label><input type="radio" name="reportType" value="health" /> Health</label>
+          <label><input type="radio" name="reportType" value="water" /> Water</label>
+        </div>
+      </div>
+      <div class="row">
+        <textarea id="reportText" placeholder="Describe the issue..."></textarea>
+      </div>
+      <div class="row controls">
+        <button id="voiceBtn" class="btn-secondary" style="width:auto;">Record voice</button>
+        <span id="voiceStatus" class="status"></span>
+      </div>
+      <div class="row">
+        <div style="font-size:14px;">Attach photo</div>
+        <input id="reportPhoto" type="file" accept="image/*" capture="environment" />
+      </div>
+      <div class="row controls" style="justify-content:space-between;">
+        <button id="submitBtn" class="btn-primary" style="flex:1;">Submit</button>
+        <button id="cancelBtn" class="btn-secondary" style="flex:1;">Cancel</button>
+      </div>
+    </div>
+  </main>
+  <footer>&copy; 2025 Rural Hydras</footer>
+<script>
+(function(){
+  const backBtn = document.getElementById('backBtn');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const submitBtn = document.getElementById('submitBtn');
+  const voiceBtn = document.getElementById('voiceBtn');
+  const voiceStatus = document.getElementById('voiceStatus');
+  const textEl = document.getElementById('reportText');
+  const photoEl = document.getElementById('reportPhoto');
+  let recog = null;
+
+  function setResumeFlag(){ try { localStorage.setItem('RH_RESUME_DASH','true'); } catch(_){} }
+  function goBack(){ setResumeFlag(); window.location.href = './index.html'; }
+  backBtn.onclick = goBack; cancelBtn.onclick = goBack;
+
+  function getReports(){ try { const r = JSON.parse(localStorage.getItem('RH_USER_REPORTS')||'[]'); return Array.isArray(r)? r: []; } catch(_){ return []; } }
+  function setReports(list){ try { localStorage.setItem('RH_USER_REPORTS', JSON.stringify(list||[])); } catch(_){ } }
+
+  function stopRec(){ try{ if(recog){ recog.stop(); } }catch(_){} recog=null; voiceBtn.textContent='Record voice'; voiceStatus.textContent=''; }
+
+  voiceBtn.onclick = function(){
+    try{
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert('Voice input not supported in this browser.');
+        return;
+      }
+      if (recog) { stopRec(); return; }
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recog = new SpeechRecognition();
+      recog.lang = 'en-IN';
+      recog.onstart = function(){ voiceStatus.textContent = 'Listening...'; voiceBtn.textContent = 'Stop'; };
+      recog.onresult = function(e){ try{ const t = e.results[0][0].transcript || ''; textEl.value = ((textEl.value||'') + (textEl.value?' ':'') + t).trim(); }catch(_){ } };
+      recog.onerror = stopRec; recog.onend = stopRec; recog.start();
+    }catch(e){ console.error(e); stopRec(); }
+  };
+
+  submitBtn.onclick = function(){
+    try{
+      const typeEl = document.querySelector('input[name="reportType"]:checked');
+      const type = typeEl ? typeEl.value : '';
+      const text = (textEl && textEl.value ? textEl.value.trim() : '');
+      if (!type) { alert('Please select Health or Water.'); return; }
+      const hasPhoto = photoEl && photoEl.files && photoEl.files[0];
+      if (!text && !hasPhoto) { alert('Please add a description or attach a photo.'); return; }
+      function finish(photoData){
+        const reports = getReports();
+        reports.unshift({ type, text, photo: photoData||'', ts: Date.now() });
+        setReports(reports);
+        alert('Report sent');
+        setResumeFlag();
+        goBack();
+      }
+      if (hasPhoto) {
+        const reader = new FileReader();
+        reader.onload = function(){ finish(reader.result); };
+        reader.onerror = function(){ finish(null); };
+        reader.readAsDataURL(photoEl.files[0]);
+      } else { finish(null); }
+    }catch(e){ console.error(e); }
+  };
+})();
+</script>
+</body>
+</html>
